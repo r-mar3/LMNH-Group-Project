@@ -11,7 +11,6 @@
 > Instructions on how to run the code (include examples?)
 
 # ERD:
-> Include ERD diagram
 ![alt text](erd.png)
 
 # Architecture Diagram
