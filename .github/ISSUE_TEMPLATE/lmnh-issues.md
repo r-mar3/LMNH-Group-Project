@@ -7,8 +7,8 @@ assignees: r-mar3
 
 ---
 
-#What is the issue?
+What is the issue?
 
-#Why is this an issue that needs resolving?
+Why is this an issue that needs resolving?
 
-#Who will this issue be assigned to?
+Who will this issue be assigned to?
