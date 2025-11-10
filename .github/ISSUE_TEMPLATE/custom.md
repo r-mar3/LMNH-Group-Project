@@ -7,11 +7,11 @@ assignees: AdamJC20, DevMjee, SamiL52, r-mar3, guavacat23
 
 ---
 
-Description:
+# Description:
  - What is the issue?
  - What is the problem that needs solving?
  - Why is this an issue that needs resolving?
 
-Urgency:
+# Urgency:
  - How important is this issue to resolve?
   -When does this need to be resolved by?
