@@ -14,4 +14,4 @@ assignees: AdamJC20, DevMjee, SamiL52, r-mar3, guavacat23
 
 # Urgency:
  - How important is this issue to resolve?
-  -When does this need to be resolved by?
+ - When does this need to be resolved by?
