@@ -12,6 +12,7 @@
 
 # ERD:
 > Include ERD diagram
+![alt text](erd.png)
 
 # Architecture Diagram
 > Include architecture diagram
