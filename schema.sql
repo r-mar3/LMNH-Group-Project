@@ -84,15 +84,30 @@ CREATE TABLE reading (
     FOREIGN KEY (plant_id) REFERENCES plant(plant_id)
 );
 
+-- SQL ids start at 1
+
 INSERT INTO 
     license (license_number, license_name, license_url) 
 VALUES
-    1, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview'
-    20, 'testing', 'https://curriculum.sigmalabs.co.uk/'
-
+    (9, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview')
+    (20, 'testing', 'https://curriculum.sigmalabs.co.uk/')
 
 INSERT INTO 
-    image (image_medium_url, image_original_url, image_regular_url, image_small_url, image_thumbnail_url, license) 
+    image (license_id, image_medium_url, image_original_url, image_regular_url, image_small_url, image_thumbnail_url) 
 VALUES
-    1, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview'
-    20, 'testing', 'https://curriculum.sigmalabs.co.uk/'
+    (1, 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png','https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png')
+
+INSERT INTO
+    country (country_name)
+VALUES
+    ('Totally-Real-Land')
+
+INSERT INTO
+    city (city_name, country_id)
+VALUES
+    ('Fake Town', 1)
+
+INSERT INTO
+    origin (origin_latitude, origin_longitude, city_id)
+VALUES
+    (0.6, 0.66, 1)
