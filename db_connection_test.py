@@ -1,4 +1,6 @@
 import pyodbc
+from os import environ
+from dotenv import load_dotenv
 
 
 def load_schema_file() -> str:
@@ -8,12 +10,13 @@ def load_schema_file() -> str:
 
 
 def get_db_connection() -> pyodbc.Connection:
+    load_dotenv()
     conn = pyodbc.connect(
         f'DRIVER={{ODBC Driver 18 for SQL Server}};'
-        f'SERVER=c20-plants-db.c57vkec7dkkx.eu-west-2.rds.amazonaws.com, 1433;'
-        f'DATABASE=plants;'
-        f'UID=beta;'
-        f'PWD=pswd-beta1;'
+        f'SERVER={environ['DB_HOST']}, {environ['DB_PORT']};'
+        f'DATABASE={environ['DB_NAME']};'
+        f'UID={environ['DB_USER']};'
+        f'PWD={environ['DB_PASSWORD']};'
         f'TrustServerCertificate=yes;'
     )
 
@@ -24,12 +27,15 @@ if __name__ == '__main__':
     conn = get_db_connection()
     cur = conn.cursor()
     schema_text = load_schema_file()
+    cur.execute('SELECT @@VERSION')
+    print(cur.fetchone())
 
     commands = schema_text.split(';')
+    conn.autocommit = True
     for command in commands:
         print(command)
         cur.execute(command)
 
-    print(cur.fetchone())
+    # print(cur.fetchone())
     cur.close()
     conn.close()
