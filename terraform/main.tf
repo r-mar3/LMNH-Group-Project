@@ -125,3 +125,60 @@ resource "aws_ecs_service" "radas-plants-ecs-service" {
   }
 }
 
+#creating a glue database for the crawler
+resource "aws_glue_catalog_database" "radas-plants-glue-db" {
+  name = "radas-plants-glue-db"
+}
+
+#creating an iam role for the crawler to use
+resource "aws_iam_role" "radas-crawler-role" {
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "glue.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+#creating an attachment for the role's policy
+resource "aws_iam_role_policy_attachment" "radas-glue-crawler-policy_attachment" {
+  role = aws_iam_role.radas-crawler-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+}
+
+#creating the policy for the crawler's IAM role
+resource "aws_iam_role_policy" "radas-glue-crawler-policy" {
+  role = aws_iam_role.radas-crawler-role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Effect = "Allow"
+        Resource = [
+          "arn:aws:s3:::radas-plants-s3",
+          "arn:aws:s3:::radas-plants-s3/" #this one is to allow crawling of subfolders
+        ]
+      }
+    ]
+  })
+}
+
+#creating a glue crawler
+resource "aws_glue_crawler" "radas-crawler" {
+  name = "radas-crawler"
+  database_name = "radas-plants-glue-db"
+  role = aws_iam_role.radas-crawler-role.arn
+  s3_target {
+    path = "s3://radas-plants-s3"
+  }
+}
