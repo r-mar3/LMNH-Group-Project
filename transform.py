@@ -23,9 +23,20 @@ def get_plants() -> list[dict]:
     return data
 
 
-def add_country(country: dict, data: dict) -> None:
+class Country:
+    def __init__(self) -> None:
+        self.country_name = []
+
+
+class City:
+    def __init__(self) -> None:
+        self.city_name = []
+        self.country_id = []
+
+
+def add_country(country: Country, data: dict) -> None:
     """Create country dict"""
-    countries = country['country_name']
+    countries = country.country_name
 
     name = data.get('origin_location')
     if name:
@@ -37,7 +48,7 @@ def add_country(country: dict, data: dict) -> None:
 
 def normalise_into_tables(data: list[dict]):
     """Separate data into relevant tables"""
-    country_dict = {'country_name': []}
+    country = Country()
     city_dict = {}
     origin_dict = {}
     reading_dict = {}
@@ -48,12 +59,12 @@ def normalise_into_tables(data: list[dict]):
     botanist_dict = {}
 
     for plant in data:
-        add_country(country_dict, plant)
+        add_country(country, plant)
 
-    return country_dict
+    return country.country_name
 
 
 if __name__ == "__main__":
     setup_output()
     plants = get_plants()
-    print(pd.DataFrame((normalise_into_tables(plants))))
+    print(pd.DataFrame(normalise_into_tables(plants)))
