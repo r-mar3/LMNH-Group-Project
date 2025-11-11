@@ -9,3 +9,6 @@
 
 .tfvars
 terraform.tfvars
+
+data
+
