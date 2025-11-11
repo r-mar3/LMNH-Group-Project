@@ -13,8 +13,8 @@
 # ERD:
 ![alt text](erd.png)
 
-# Architecture Diagram
-> Include architecture diagram
+# Architecture Diagram:
+![alt text](architecture.png)
 
 # Credits:
 - Adam Cummings: Engineer & Analyst, Architect & DevOps
