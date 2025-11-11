@@ -20,10 +20,12 @@ def get_db_connection() -> pyodbc.Connection:
 
 
 def load_csv(filepath: str) -> pd.DataFrame:
+    """Returns a dataframe of the csv at a given filepath"""
     return pd.read_csv(filepath)
 
 
 def upload_table_data(conn: pyodbc.Connection, table_name: str, df: pd.DataFrame) -> None:
+    """Uploads the data in the given dataframe to the matching table in the database"""
     columns = list(df.columns)
     column_names = ', '.join(columns)
     column_placeholders = ', '.join('?' for _ in columns)
