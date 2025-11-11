@@ -1,7 +1,9 @@
-import requests as req
+# pylint: disable=logging-fstring-interpolation
+"""Script to extract data from the plants api and save to .json file"""
 import json
 import logging
 import argparse
+import requests as req
 
 BASE_URL = 'http://sigma-labs-bot.herokuapp.com/api/plants/'
 OUTPUT_FILE = './raw_data/plant_data_raw.json'
@@ -22,9 +24,9 @@ def set_up_logging() -> None:
     logging.basicConfig(level=logging.ERROR)
 
 
-def fetch_data_by_id(id: int) -> dict:
+def fetch_data_by_id(plant_id: int) -> dict:
     """Returns a dict with status code and response data"""
-    response = req.get(f"{BASE_URL}{id}")
+    response = req.get(f"{BASE_URL}{plant_id}", timeout=5)
 
     body = response.json()
     status_code = response.status_code
