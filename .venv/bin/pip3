@@ -1,8 +1,9 @@
-#!/Users/devmukheejee/Desktop/coursework/LMNH-Group-Project/.venv/bin/python3
-# -*- coding: utf-8 -*-
-import re
+#!/bin/sh
+'''exec' "/Users/samilachqar/Documents/Group Project 1/LMNH-Group-Project/.venv/bin/python3.13" "$0" "$@"
+' '''
 import sys
 from pip._internal.cli.main import main
 if __name__ == '__main__':
-    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    if sys.argv[0].endswith('.exe'):
+        sys.argv[0] = sys.argv[0][:-4]
     sys.exit(main())

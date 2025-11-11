@@ -30,7 +30,7 @@ CREATE TABLE country (
 
 CREATE TABLE city (
     city_id INT GENERATED ALWAYS AS IDENTITY,
-    city_name UNIQUE TEXT,
+    city_name TEXT, -- Not unique, cities can have the same name
     country_id INT,
     PRIMARY KEY (city_id),
     FOREIGN KEY (country_id) REFERENCES country(country_id)
@@ -52,7 +52,7 @@ CREATE TABLE species (
     image_id INT,
     PRIMARY KEY (species_id),
     FOREIGN KEY (image_id) REFERENCES image(image_id)
-)
+);
 
 CREATE TABLE plant (
     plant_id INT GENERATED ALWAYS AS IDENTITY,
