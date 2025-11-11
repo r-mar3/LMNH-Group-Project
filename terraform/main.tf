@@ -2,12 +2,15 @@ provider "aws" {
     region = "eu-west-2"
 }
 
+#security group for the database
 resource "aws_security_group" "radas-group-project-sg" {
   name = "radas-group-project-sg"
   description = "security group for the museum database"
   vpc_id = var.vpc_id
 
 }
+
+#security group rule to allow ingress on port 1433 (MS SQL Server)
 resource "aws_security_group_rule" "allow_TCP_1433_rule" {
     security_group_id = aws_security_group.radas-group-project-sg.id
     type              = "ingress"
@@ -17,16 +20,19 @@ resource "aws_security_group_rule" "allow_TCP_1433_rule" {
     cidr_blocks       = ["0.0.0.0/0"]
 }
 
+#creating subnet group using the C20 VPC subnets
 resource "aws_db_subnet_group" "radas-db-subnet-group" {
   name = "radas-db-subnet-group"
   subnet_ids = ["subnet-0c47ef6fc81ba084a", "subnet-00c68b4e0ee285460", "subnet-0c2e92c1b7b782543"]
 }
 
+#creating the S3 bucket to store the plants data
 resource "aws_s3_bucket" "radas-plants-s3" {
   bucket = "radas-plants-s3"
   force_destroy = true
 }
 
+#specifies to not create a new version of the s3 every time the data is changed
 resource "aws_s3_bucket_versioning" "radas-plants-s3-version" {
   bucket = aws_s3_bucket.radas-plants-s3.id
   versioning_configuration {
@@ -34,6 +40,7 @@ resource "aws_s3_bucket_versioning" "radas-plants-s3-version" {
   }
 }
 
+#create ECR to store docker image
 resource "aws_ecr_repository" "radas-plants-ecr" {
   name = "radas-plants-ecr"
   image_tag_mutability = "MUTABLE"
@@ -47,10 +54,12 @@ resource "aws_ecr_repository" "radas-plants-ecr" {
   }
 }
 
+#outputs the ECR url
 output "repository_url" {
   value = aws_ecr_repository.radas-plants-ecr.repository_url
 }
 
+#creates the ECS cluster for running tasks on
 resource "aws_ecs_cluster" "radas-plants-ecs" {
   name = "radas-plants-ecs"
   setting {
@@ -59,16 +68,19 @@ resource "aws_ecs_cluster" "radas-plants-ecs" {
   }
 }
 
+#specifies Fargate as the capacity provider for ECS
 resource "aws_ecs_cluster_capacity_providers" "radas-plants-ecs-provider" {
   cluster_name = aws_ecs_cluster.radas-plants-ecs.name
   capacity_providers = ["FARGATE"]
   
 }
 
+#IAM role for executing tasks on the ECS
 data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 }
 
+#Creating the task definition family for the ECS
 resource "aws_ecs_task_definition" "radas-plants-pipeline" {
   family = "radas-plants-pipeline-family"
   network_mode = "awsvpc"
@@ -99,12 +111,14 @@ container_definitions = jsonencode([
   execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
 }
 
+#Creating a service on the ECS to run
 resource "aws_ecs_service" "radas-plants-ecs-service" {
   name = "radas-plants-ecs-service"
   cluster = aws_ecs_cluster.radas-plants-ecs.id
   task_definition = aws_ecs_task_definition.radas-plants-pipeline.arn
   desired_count = 1
   
+  #specifying the network to use for the service
   network_configuration {
     subnets = aws_db_subnet_group.radas-db-subnet-group.subnet_ids
     security_groups = [aws_security_group.radas-group-project-sg.id]
