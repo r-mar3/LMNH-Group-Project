@@ -2,8 +2,13 @@
 
 .venv
 
+.env
+
 *.pem
 *.pemkey
 
 .tfvars
 terraform.tfvars
+
+data
+
