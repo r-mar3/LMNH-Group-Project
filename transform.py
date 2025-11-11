@@ -72,11 +72,43 @@ class CityTable(Entity):
                 city_name = origin.get('city')
                 country_name = origin.get('country')
 
-                cities['city_name'].append(city_name)
-                country_id = countries.data.index(country_name)
+                # check to add to dict
+                if city_name not in cities['city_name']:
+                    cities['city_name'].append(city_name)
+                    country_id = countries.data.index(country_name)
+                    cities['country_id'].append(country_id)
 
-            else:
-                values = None
+        self.data = cities
+
+    def transform(self) -> None:
+        self.add_cities()
+        super().transform()
+
+
+class OriginTable(Entity):
+    # FINISH ME AAAAAAAAHHHHHHHH!!!!!!!
+    def __init__(self, data: list[dict], cities: CityTable) -> None:
+        super().__init__(data)
+        self.countries = countries
+        self.column_names = ['longitude', 'latitude', 'city_id']
+        self.column_id = 'origin_id'
+        self.filename = f'{OUTPUT_FOLDER}city.csv'
+
+    def add_cities(self) -> None:
+        """Add city to self"""
+        cities = {'city_name': [], 'country_id': []}
+
+        for plant in self.data:
+            origin = plant.get('origin_location')
+            if origin:
+                city_name = origin.get('city')
+                country_name = origin.get('country')
+
+                # check to add to dict
+                if city_name not in cities['city_name']:
+                    cities['city_name'].append(city_name)
+                    country_id = countries.data.index(country_name)
+                    cities['country_id'].append(country_id)
 
         self.data = cities
 
