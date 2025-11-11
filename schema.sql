@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS license;
 DROP TABLE IF EXISTS botanist;
 
 CREATE TABLE license (
-    license_id INT IDENTITY(1, 1),
+    license_id INT UNIQUE,
     license_number INT UNIQUE,
     license_name VARCHAR(255) UNIQUE,
     license_url VARCHAR(255) UNIQUE,
@@ -17,7 +17,7 @@ CREATE TABLE license (
 );
 
 CREATE TABLE image (
-    image_id INT IDENTITY(1, 1),
+    image_id INT UNIQUE,
     image_original_url VARCHAR(255) UNIQUE,
     image_regular_url VARCHAR(255) UNIQUE,
     image_medium_url VARCHAR(255) UNIQUE,
@@ -29,13 +29,13 @@ CREATE TABLE image (
 );
 
 CREATE TABLE country (
-    country_id INT IDENTITY(1, 1),
+    country_id INT UNIQUE,
     country_name VARCHAR(255) UNIQUE,
     PRIMARY KEY (country_id)
 );
 
 CREATE TABLE city (
-    city_id INT IDENTITY(1, 1),
+    city_id INT UNIQUE,
     city_name VARCHAR(255), -- Not unique, cities can have the same name
     country_id INT,
     PRIMARY KEY (city_id),
@@ -43,7 +43,7 @@ CREATE TABLE city (
 );
 
 CREATE TABLE origin (
-    origin_id INT IDENTITY(1, 1),
+    origin_id INT UNIQUE,
     origin_longitude FLOAT, -- left non-unique in case of rounding errors
     origin_latitude FLOAT, -- left non-unique in case of rounding errors
     city_id INT,
@@ -52,7 +52,7 @@ CREATE TABLE origin (
 );
 
 CREATE TABLE species (
-    species_id INT IDENTITY(1, 1),
+    species_id INT UNIQUE,
     species_name VARCHAR(255) UNIQUE,
     species_scientific_name VARCHAR(255) UNIQUE,
     image_id INT,
@@ -61,7 +61,7 @@ CREATE TABLE species (
 );
 
 CREATE TABLE plant (
-    plant_id INT IDENTITY(1, 1),
+    plant_id INT UNIQUE,
     origin_id INT,
     species_id INT,
     PRIMARY KEY (plant_id),
@@ -70,7 +70,7 @@ CREATE TABLE plant (
 );
 
 CREATE TABLE botanist (
-    botanist_id INT IDENTITY(1, 1),
+    botanist_id INT UNIQUE,
     botanist_name VARCHAR(255), -- left non-unique for John Smiths
     botanist_email VARCHAR(255) UNIQUE,
     botanist_phone VARCHAR(255) UNIQUE,
@@ -83,6 +83,7 @@ CREATE TABLE reading (
     reading_time_taken DATETIME, -- plants can be read at the same time
     reading_soil_moisture FLOAT, -- plants can be equally moist
     reading_temperature FLOAT, -- plants can be equally hot or cold
+    reading_error TEXT,
     botanist_id INT,
     plant_id INT,
     PRIMARY KEY (reading_id),
@@ -93,26 +94,26 @@ CREATE TABLE reading (
 -- SQL ids start at 1
 
 INSERT INTO 
-    license (license_number, license_name, license_url) 
+    license (license_id, license_number, license_name, license_url) 
 VALUES
-    (9, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview');
+    (1, 9, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview');
 
 INSERT INTO 
-    image (license_id, image_medium_url, image_original_url, image_regular_url, image_small_url, image_thumbnail_url) 
+    image (image_id, license_id, image_medium_url, image_original_url, image_regular_url, image_small_url, image_thumbnail_url) 
 VALUES
-    (1, 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png','https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png');
+    (1, 1, 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png','https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png');
 
 INSERT INTO
-    country (country_name)
+    country (country_id, country_name)
 VALUES
-    ('Totally-Real-Land');
+    (1, 'Totally-Real-Land');
 
 INSERT INTO
-    city (city_name, country_id)
+    city (city_id, city_name, country_id)
 VALUES
-    ('Fake Town', 1);
+    (1, 'Fake Town', 1);
 
 INSERT INTO
-    origin (origin_latitude, origin_longitude, city_id)
+    origin (origin_id, origin_latitude, origin_longitude, city_id)
 VALUES
-    (0.6, 0.66, 1);
+    (1, 0.6, 0.66, 1);
