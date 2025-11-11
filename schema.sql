@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS plants;
+CREATE DATABASE plants;
+\c plants;
+
 CREATE TABLE license (
     license_id INT GENERATED ALWAYS AS IDENTITY,
     license_number INT,
@@ -32,24 +36,29 @@ CREATE TABLE city (
     FOREIGN KEY (country_id) REFERENCES country(country_id)
 );
 
--- TODO: check what numbers to use after decimal for long and lat
 CREATE TABLE origin (
     origin_id INT GENERATED ALWAYS AS IDENTITY,
-    origin_longitude DECIMAL(9, 6),
-    origin_longitude DECIMAL(9, 6),
+    origin_longitude FLOAT,
+    origin_latitude FLOAT,
     city_id INT,
     PRIMARY KEY (origin_id),
     FOREIGN KEY (city_id) REFERENCES city(city_id)
 );
 
+CREATE TABLE species (
+    species_id INT GENERATED ALWAYS AS IDENTITY,
+    species_name TEXT,
+    species_scientific_name TEXT,
+    image_id INT,
+    PRIMARY KEY (species_id),
+    FOREIGN KEY (image_id) REFERENCES image(image_id)
+)
+
 CREATE TABLE plant (
     plant_id INT GENERATED ALWAYS AS IDENTITY,
-    plant_name TEXT,
-    plant_scientific_name TEXT,
-    plant_origin_id INT,
-    plant_images_id INT,
+    origin_id INT,
     PRIMARY KEY (plant_id),
-    FOREIGN KEY (plant_origin_id) REFERENCES origin(origin_id)
+    FOREIGN KEY (origin_id) REFERENCES origin(origin_id)
 );
 
 CREATE TABLE botanist (
@@ -66,9 +75,9 @@ CREATE TABLE reading (
     reading_time_taken TIMESTAMP,
     reading_soil_moisture FLOAT,
     reading_temperature FLOAT,
-    reading_botanist_id INT,
-    reading_plant_id INT,
+    botanist_id INT,
+    plant_id INT,
     PRIMARY KEY (reading_id),
-    FOREIGN KEY (reading_botanist_id) REFERENCES botanist(botanist_id),
-    FOREIGN KEY (reading_plant_id) REFERENCES plant(plant_id)
+    FOREIGN KEY (botanist_id) REFERENCES botanist(botanist_id),
+    FOREIGN KEY (plant_id) REFERENCES plant(plant_id)
 );
