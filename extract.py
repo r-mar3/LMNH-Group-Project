@@ -3,6 +3,7 @@
 import json
 import logging
 import argparse
+import os
 import requests as req
 
 BASE_URL = 'http://sigma-labs-bot.herokuapp.com/api/plants/'
@@ -38,6 +39,9 @@ def fetch_data_by_id(plant_id: int) -> dict:
 
 def save_to_json(data: list[dict]) -> None:
     """Saves list of dicts with plant data to a single json file"""
+    if not os.path.exists('./raw_data'):
+        os.makedirs('./raw_data')
+
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
 
