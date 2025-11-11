@@ -90,30 +90,3 @@ CREATE TABLE reading (
     FOREIGN KEY (botanist_id) REFERENCES botanist(botanist_id),
     FOREIGN KEY (plant_id) REFERENCES plant(plant_id)
 );
-
--- SQL ids start at 1
-
-INSERT INTO 
-    license (license_id, license_number, license_name, license_url) 
-VALUES
-    (1, 9, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview');
-
-INSERT INTO 
-    image (image_id, license_id, image_medium_url, image_original_url, image_regular_url, image_small_url, image_thumbnail_url) 
-VALUES
-    (1, 1, 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png','https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png');
-
-INSERT INTO
-    country (country_id, country_name)
-VALUES
-    (1, 'Totally-Real-Land');
-
-INSERT INTO
-    city (city_id, city_name, country_id)
-VALUES
-    (1, 'Fake Town', 1);
-
-INSERT INTO
-    origin (origin_id, origin_latitude, origin_longitude, city_id)
-VALUES
-    (1, 0.6, 0.66, 1);
