@@ -46,7 +46,7 @@ class Origin(Entity):
         super().__init__(
             data, ['origin_id', 'longitude', 'latitude', 'city_id'], 'city_id')
 
-    def transform(self):
+    def transform(self) -> None:
         return super().transform()
 
 
@@ -55,23 +55,24 @@ class Plant(Entity):
         super().__init__(
             data, ['plant_id', 'species_id', 'origin_id'], 'plant_id')
 
-    def transform(self):
+    def transform(self) -> None:
         return super().transform()
 
 
 class Botanist(Entity):
     def __init__(self, data, column_names, column_id):
-        super().__init__(data, column_names, column_id)
+        super().__init__(data, ['botanist_id', 'name',
+                                'email', 'phone'], 'botanist_id')
 
-    def transform(self):
+    def transform(self) -> None:
         return super().transform()
 
 
-class Image(Entity):
+class Images(Entity):
     def __init__(self, data, column_names, column_id):
         super().__init__(data, column_names, column_id)
 
-    def transform(self):
+    def transform(self) -> None:
         return super().transform()
 
 
@@ -79,15 +80,16 @@ class License(Entity):
     def __init__(self, data, column_names, column_id):
         super().__init__(data, column_names, column_id)
 
-    def transform(self):
+    def transform(self) -> None:
         return super().transform()
 
 
 class Species(Entity):
     def __init__(self, data, column_names, column_id):
-        super().__init__(data, column_names, column_id)
+        super().__init__(data, ['species_id', 'name',
+                                'scientific_name', 'images_id'], column_id)
 
-    def transform(self):
+    def transform(self) -> None:
         return super().transform()
 
 
