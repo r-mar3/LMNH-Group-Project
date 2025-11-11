@@ -7,32 +7,82 @@ from pandas import DataFrame
 from pprint import pprint
 
 INPUT_FILE = './data/raw_data/plant_data_raw.json'
-OUTPUT_FOLDER = './data//clean_data'
+OUTPUT_FOLDER = './data//clean_data/'
 
 
 class Entity:
     def __init__(self, data: list[dict]) -> None:
         self.data = data
+        self.column_id = 'id'
+        self.column_names = ['entity']
+        self.filename = 'entity.csv'
 
-    def transform(self) -> pd.DataFrame:
-        return pd.DataFrame(self.data)
+    def save_file(self) -> None:
+        df = pd.DataFrame(self.data, columns=self.column_names)
+        df.to_csv(self.filename, index_label=self.column_id)
+
+    def transform(self) -> None:
+        self.save_file()
 
 
-class Country(Entity):
+class CountryTable(Entity):
     def __init__(self, data: list[dict]) -> None:
         super().__init__(data)
+        self.column_names = ['country_name']
+        self.column_id = 'country_id'
+        self.filename = f'{OUTPUT_FOLDER}country.csv'
 
-    def transform(self) -> pd.DataFrame:
+    def add_countries(self) -> None:
+        """Add country to self"""
+        countries = []
 
-        return super().transform()
+        for plant in self.data:
+            origin = plant.get('origin_location')
+            if origin:
+                # only one value in values in this case
+                values = origin.get('country')
+            else:
+                values = None
+
+            if values and values not in countries:  # ensure unique
+                countries.append(values)
+
+        self.data = countries
+
+    def transform(self) -> None:
+        self.add_countries()
+        super().transform()
 
 
-class City(Entity):
-    def __init__(self, data: list[dict]) -> None:
+class CityTable(Entity):
+    def __init__(self, data: list[dict], countries: CountryTable) -> None:
         super().__init__(data)
+        self.countries = countries
+        self.column_names = ['city_name', 'country_id']
+        self.column_id = 'city_id'
+        self.filename = f'{OUTPUT_FOLDER}city.csv'
 
-    def transform(self) -> pd.DataFrame:
-        return super().transform()
+    def add_cities(self) -> None:
+        """Add city to self"""
+        cities = {'city_name': [], 'country_id': []}
+
+        for plant in self.data:
+            origin = plant.get('origin_location')
+            if origin:
+                city_name = origin.get('city')
+                country_name = origin.get('country')
+
+                cities['city_name'].append(city_name)
+                country_id = countries.data.index(country_name)
+
+            else:
+                values = None
+
+        self.data = cities
+
+    def transform(self) -> None:
+        self.add_cities()
+        super().transform()
 
 
 def setup_output() -> None:
@@ -49,37 +99,10 @@ def get_plants() -> list[dict]:
     return data
 
 
-def add_country(country: Country, data: dict) -> None:
-    """Create country dict"""
-    countries = country.country_name
-
-    name = data.get('origin_location')
-    if name:
-        name = name.get('country')
-
-    if name and name not in countries:
-        countries.append(name)
-
-
-def normalise_into_tables(data: list[dict]):
-    """Separate data into relevant tables"""
-    country = Country()
-    city_dict = {}
-    origin_dict = {}
-    reading_dict = {}
-    plant_dict = {}
-    species_dict = {}
-    image_dict = {}
-    license_dict = {}
-    botanist_dict = {}
-
-    for plant in data:
-        add_country(country, plant)
-
-    return country.country_name
-
-
 if __name__ == "__main__":
-    # setup_output()
-    # plants = get_plants()
-    # print(pd.DataFrame(normalise_into_tables(plants)))
+    setup_output()
+    plants = get_plants()
+    countries = CountryTable(plants)
+    countries.transform()
+    cities = CityTable(plants, countries)
+    cities.transform()
