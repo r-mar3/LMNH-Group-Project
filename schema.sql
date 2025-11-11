@@ -94,26 +94,26 @@ CREATE TABLE reading (
 -- SQL ids start at 1
 
 INSERT INTO 
-    license (license_number, license_name, license_url) 
+    license (license_id, license_number, license_name, license_url) 
 VALUES
-    (9, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview');
+    (1, 9, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview');
 
 INSERT INTO 
-    image (license_id, image_medium_url, image_original_url, image_regular_url, image_small_url, image_thumbnail_url) 
+    image (image_id, license_id, image_medium_url, image_original_url, image_regular_url, image_small_url, image_thumbnail_url) 
 VALUES
-    (1, 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png','https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png');
+    (1, 1, 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png','https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png', 'https://curriculum.sigmalabs.co.uk/assets/images/overview-374a124b9ca035b674ea6513e5d49898.png');
 
 INSERT INTO
-    country (country_name)
+    country (country_id, country_name)
 VALUES
-    ('Totally-Real-Land');
+    (1, 'Totally-Real-Land');
 
 INSERT INTO
-    city (city_name, country_id)
+    city (city_id, city_name, country_id)
 VALUES
-    ('Fake Town', 1);
+    (1, 'Fake Town', 1);
 
 INSERT INTO
-    origin (origin_latitude, origin_longitude, city_id)
+    origin (origin_id, origin_latitude, origin_longitude, city_id)
 VALUES
-    (0.6, 0.66, 1);
+    (1, 0.6, 0.66, 1);
