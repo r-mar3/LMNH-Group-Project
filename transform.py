@@ -4,9 +4,35 @@ import json
 import os
 import pandas as pd
 from pandas import DataFrame
+from pprint import pprint
 
 INPUT_FILE = './data/raw_data/plant_data_raw.json'
 OUTPUT_FOLDER = './data//clean_data'
+
+
+class Entity:
+    def __init__(self, data: list[dict]) -> None:
+        self.data = data
+
+    def transform(self) -> pd.DataFrame:
+        return pd.DataFrame(self.data)
+
+
+class Country(Entity):
+    def __init__(self, data: list[dict]) -> None:
+        super().__init__(data)
+
+    def transform(self) -> pd.DataFrame:
+
+        return super().transform()
+
+
+class City(Entity):
+    def __init__(self, data: list[dict]) -> None:
+        super().__init__(data)
+
+    def transform(self) -> pd.DataFrame:
+        return super().transform()
 
 
 def setup_output() -> None:
@@ -21,17 +47,6 @@ def get_plants() -> list[dict]:
         # Parsing the JSON file into a Python dictionary
         data = json.load(f)
     return data
-
-
-class Country:
-    def __init__(self) -> None:
-        self.country_name = []
-
-
-class City:
-    def __init__(self) -> None:
-        self.city_name = []
-        self.country_id = []
 
 
 def add_country(country: Country, data: dict) -> None:
@@ -65,6 +80,6 @@ def normalise_into_tables(data: list[dict]):
 
 
 if __name__ == "__main__":
-    setup_output()
-    plants = get_plants()
-    print(pd.DataFrame(normalise_into_tables(plants)))
+    # setup_output()
+    # plants = get_plants()
+    # print(pd.DataFrame(normalise_into_tables(plants)))
