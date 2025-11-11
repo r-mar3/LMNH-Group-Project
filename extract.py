@@ -7,7 +7,9 @@ import os
 import requests as req
 
 BASE_URL = 'http://sigma-labs-bot.herokuapp.com/api/plants/'
-OUTPUT_FILE = './raw_data/plant_data_raw.json'
+OUTPUT_FOLDER = './data/raw_data/'
+OUTPUT_FILE = f'{OUTPUT_FOLDER}plant_data_raw.json'
+
 SEARCH_RANGE_MAX = 51
 
 
@@ -40,8 +42,8 @@ def fetch_data_by_id(plant_id: int) -> dict:
 
 def save_to_json(data: list[dict]) -> None:
     """Saves list of dicts with plant data to a single json file"""
-    if not os.path.exists('./raw_data'):
-        os.makedirs('./raw_data')
+    if not os.path.exists(OUTPUT_FOLDER):
+        os.makedirs(OUTPUT_FOLDER)
 
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4)
@@ -60,4 +62,5 @@ def extract_data() -> None:
 
 
 if __name__ == "__main__":
+    set_up_logging()
     extract_data()
