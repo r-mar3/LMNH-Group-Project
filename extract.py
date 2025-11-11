@@ -37,7 +37,7 @@ def fetch_data_by_id(plant_id: int) -> dict:
     if status_code == 404:
         raise ValueError
 
-    return {"status_code": status_code, "body": body}
+    return body
 
 
 def save_to_json(data: list[dict]) -> None:
