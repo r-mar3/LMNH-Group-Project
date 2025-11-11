@@ -89,3 +89,10 @@ INSERT INTO
 VALUES
     1, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview'
     20, 'testing', 'https://curriculum.sigmalabs.co.uk/'
+
+
+INSERT INTO 
+    image (image_medium_url, image_original_url, image_regular_url, image_small_url, image_thumbnail_url, license) 
+VALUES
+    1, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview'
+    20, 'testing', 'https://curriculum.sigmalabs.co.uk/'
