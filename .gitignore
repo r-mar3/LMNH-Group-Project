@@ -7,3 +7,4 @@
 
 .tfvars
 terraform.tfvars
+.env
