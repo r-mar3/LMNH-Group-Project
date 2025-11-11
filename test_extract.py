@@ -1,7 +1,7 @@
 """Tests extract script edge cases, ideal and unideal behaviour"""
 import json
 import pytest
-from extract import fetch_data_by_id, save_to_json, extract_data
+from extract import fetch_data_by_id, save_to_json, extract_data, SEARCH_RANGE_MAX
 
 
 def test_fetch_data_by_id_body_type():
@@ -12,7 +12,7 @@ def test_fetch_data_by_id_body_type():
 def test_fetch_data_by_id_failure_1():
     """Asserts that a ValueError is raised if id is out of range"""
     with pytest.raises(ValueError):
-        fetch_data_by_id(51)
+        fetch_data_by_id(SEARCH_RANGE_MAX)
 
 
 def test_fetch_data_by_id_failure_2():
