@@ -4,19 +4,19 @@ CREATE DATABASE plants;
 
 CREATE TABLE license (
     license_id INT GENERATED ALWAYS AS IDENTITY,
-    license_number INT,
-    license_name TEXT,
-    license_url TEXT,
+    license_number UNIQUE INT,
+    license_name UNIQUE TEXT,
+    license_url UNIQUE TEXT,
     PRIMARY KEY (license_id)
 );
 
 CREATE TABLE image (
     image_id INT GENERATED ALWAYS AS IDENTITY,
-    image_original_url TEXT,
-    image_regular_url TEXT,
-    image_medium_url TEXT,
-    image_small_url TEXT,
-    image_thumbnail_url TEXT,
+    image_original_url UNIQUE TEXT,
+    image_regular_url UNIQUE TEXT,
+    image_medium_url UNIQUE TEXT,
+    image_small_url UNIQUE TEXT,
+    image_thumbnail_url UNIQUE TEXT,
     license_id INT,
     PRIMARY KEY (image_id),
     FOREIGN KEY (license_id) REFERENCES license(license_id)
@@ -24,13 +24,13 @@ CREATE TABLE image (
 
 CREATE TABLE country (
     country_id INT GENERATED ALWAYS AS IDENTITY,
-    country_name TEXT,
+    country_name UNIQUE TEXT,
     PRIMARY KEY (country_id)
 );
 
 CREATE TABLE city (
     city_id INT GENERATED ALWAYS AS IDENTITY,
-    city_name TEXT,
+    city_name UNIQUE TEXT,
     country_id INT,
     PRIMARY KEY (city_id),
     FOREIGN KEY (country_id) REFERENCES country(country_id)
@@ -38,8 +38,8 @@ CREATE TABLE city (
 
 CREATE TABLE origin (
     origin_id INT GENERATED ALWAYS AS IDENTITY,
-    origin_longitude FLOAT,
-    origin_latitude FLOAT,
+    origin_longitude FLOAT, -- left non-unique in case of rounding errors
+    origin_latitude FLOAT, -- left non-unique in case of rounding errors
     city_id INT,
     PRIMARY KEY (origin_id),
     FOREIGN KEY (city_id) REFERENCES city(city_id)
@@ -47,8 +47,8 @@ CREATE TABLE origin (
 
 CREATE TABLE species (
     species_id INT GENERATED ALWAYS AS IDENTITY,
-    species_name TEXT,
-    species_scientific_name TEXT,
+    species_name UNIQUE TEXT,
+    species_scientific_name UNIQUE TEXT,
     image_id INT,
     PRIMARY KEY (species_id),
     FOREIGN KEY (image_id) REFERENCES image(image_id)
@@ -57,27 +57,35 @@ CREATE TABLE species (
 CREATE TABLE plant (
     plant_id INT GENERATED ALWAYS AS IDENTITY,
     origin_id INT,
+    species_id INT,
     PRIMARY KEY (plant_id),
     FOREIGN KEY (origin_id) REFERENCES origin(origin_id)
+    FOREIGN KEY (species_id) REFERENCES species(species_id)
 );
 
 CREATE TABLE botanist (
     botanist_id INT GENERATED ALWAYS AS IDENTITY,
-    botanist_name TEXT,
-    botanist_email TEXT,
-    botanist_phone TEXT,
+    botanist_name TEXT, -- left non-unique for John Smiths
+    botanist_email UNIQUE TEXT,
+    botanist_phone UNIQUE TEXT,
     PRIMARY KEY (botanist_id)
 );
 
 CREATE TABLE reading (
     reading_id INT GENERATED ALWAYS AS IDENTITY,
-    reading_last_watered TIMESTAMP,
-    reading_time_taken TIMESTAMP,
-    reading_soil_moisture FLOAT,
-    reading_temperature FLOAT,
+    reading_last_watered TIMESTAMP, -- plants can be watered at the same time
+    reading_time_taken TIMESTAMP, -- plants can be read at the same time
+    reading_soil_moisture FLOAT, -- plants can be equally moist
+    reading_temperature FLOAT, -- plants can be equally hot or cold
     botanist_id INT,
     plant_id INT,
     PRIMARY KEY (reading_id),
     FOREIGN KEY (botanist_id) REFERENCES botanist(botanist_id),
     FOREIGN KEY (plant_id) REFERENCES plant(plant_id)
 );
+
+INSERT INTO 
+    license (license_number, license_name, license_url) 
+VALUES
+    1, 'test', 'https://curriculum.sigmalabs.co.uk/Advanced-Data/Week%205/overview'
+    20, 'testing', 'https://curriculum.sigmalabs.co.uk/'
