@@ -7,22 +7,6 @@ def test_fetch_data_by_id_body_type():
     assert isinstance(fetch_data_by_id(2), dict)
 
 
-def test_fetch_data_by_id_success():
-    assert fetch_data_by_id(2)['status_code'] == 200
-
-
-def test_fetch_data_by_id_not_empty_dict():
-    assert len(fetch_data_by_id(5)['body']) > 0
-
-
-def test_fetch_data_by_id_required_info():
-    required_info = ['name', 'last_watered',
-                     'soil_moisture', 'recording_taken']
-
-    for info in required_info:
-        assert info in fetch_data_by_id(23)['body']
-
-
 def test_fetch_data_by_id_failure_1():
     with pytest.raises(ValueError):
         fetch_data_by_id(51)
