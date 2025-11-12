@@ -8,7 +8,6 @@ import requests as req
 
 BASE_URL = 'http://sigma-labs-bot.herokuapp.com/api/plants/'
 OUTPUT_FILE = './raw_data/plant_data_raw.json'
-SEARCH_RANGE_MAX = 51
 
 
 def set_up_logging() -> None:
@@ -50,11 +49,21 @@ def save_to_json(data: list[dict]) -> None:
 def extract_data() -> None:
     """Runs the extract functions for all ids and catches error"""
     data = []
-    for i in range(1, SEARCH_RANGE_MAX):
+    plant_id_index = 0
+    not_found_count = 0
+    in_range = True
+    while in_range:
         try:
-            data.append(fetch_data_by_id(i))
+            data.append(fetch_data_by_id(plant_id_index))
+            not_found_count = 0
         except ValueError:
-            logging.error(f"Plant with id '{i}' was not found")
+            logging.error(f"Plant with id '{plant_id_index}' was not found")
+            not_found_count += 1
+
+        if not_found_count >= 10:
+            in_range = False
+
+        plant_id_index += 1
 
     save_to_json(data)
 
