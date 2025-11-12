@@ -13,16 +13,16 @@ OUTPUT_FOLDER = './data//clean_data/'
 class Entity:
     def __init__(self, data: list[dict], column_id: str, column_names: list[str], filename: str) -> None:
         self.data = data
-        self.column_id = 'id'
-        self.column_names = ['entity']
-        self.filename = 'entity.csv'
+        self.column_id = column_id
+        self.column_names = column_names
+        self.filename = filename
 
-    def save_file(self) -> None:
-        df = pd.DataFrame(self.data, columns=self.column_names)
-        df.to_csv(self.filename, index_label=self.column_id)
+    def create_data_dict(self):
+        return {column_name: [] for column_name in self.column_names}
 
     def transform(self) -> None:
-        self.save_file()
+        df = pd.DataFrame(self.data, columns=self.column_names)
+        df.to_csv(self.filename, index_label=self.column_id)
 
 
 class CountryTable(Entity):
@@ -32,12 +32,12 @@ class CountryTable(Entity):
 
     def add_countries(self) -> None:
         """Add country to self"""
-        countries = {'country_name', []}
+        countries = self.create_data_dict()
 
         for plant in self.data:
-            origin = plant.get('origin_location')
-            if origin:
-                country_name = origin.get('country')
+            origin_data = plant.get('origin_location')
+            if origin_data:
+                country_name = origin_data.get('country')
                 countries['country_name'].append(country_name)
 
         self.data = countries
@@ -55,13 +55,13 @@ class CityTable(Entity):
 
     def add_cities(self) -> None:
         """Add city to self"""
-        cities = {'city_name': [], 'country_id': []}
+        cities = self.create_data_dict()
 
         for plant in self.data:
-            origin = plant.get('origin_location')
-            if origin:
-                city_name = origin.get('city')
-                country_name = origin.get('country')
+            origin_data = plant.get('origin_location')
+            if origin_data:
+                city_name = origin_data.get('city')
+                country_name = origin_data.get('country')
                 cities['city_name'].append(city_name)
 
                 if country_name in self.countries['country_name']:
@@ -84,16 +84,16 @@ class OriginTable(Entity):
 
     def add_origins(self) -> None:
         """Add origin to self"""
-        origins = {'longitude': [], 'latitude': [], 'city_id': []}
+        origins = self.create_data_dict()
 
         for plant in self.data:
-            origin = plant.get('origin_location')
-            if origin:
-                longitude = origin.get('longitude')
-                latitude = origin.get('latitude')
+            origin_data = plant.get('origin_location')
+            if origin_data:
+                longitude = origin_data.get('longitude')
+                latitude = origin_data.get('latitude')
                 origins['longitude'].append(longitude)
                 origins['latitude'].append(latitude)
-                city_name = origin.get('city')
+                city_name = origin_data.get('city')
 
                 if city_name in cities['city_name']:
                     city_id = cities.data.index(city_name)
@@ -112,8 +112,19 @@ class BotanistTable(Entity):
             'name', 'email', 'phone'], f'{OUTPUT_FOLDER}botanist.csv')
 
     def add_botanists(self):
-        # TODO: implement this
-        pass
+        botanists = self.create_data_dict()
+
+        for plant in self.data:
+            botanist_data = plant.get('botanist')
+            if botanist_data:
+                name = botanist_data.get('name')
+                email = botanist_data.get('email')
+                phone = botanist_data.get('phone')
+                botanists['name'].append(name)
+                botanists['email'].append(email)
+                botanists['phone'].append(phone)
+
+        self.data = botanists
 
     def transform(self):
         self.add_botanists()
@@ -126,8 +137,18 @@ class LicenseTable(Entity):
             'license_number', 'license_name', 'license_url'], f'{OUTPUT_FOLDER}license.csv')
 
     def add_licenses(self):
-        # TODO: implement this
-        pass
+        licenses = self.create_data_dict()
+        for plant in self.data:
+            image_data = plant.get('images')
+            if image_data:
+                license_number = image_data.get('license')
+                license_name = image_data.get('license_name')
+                license_url = image_data.get('license_url')
+                licenses['license_number'].append(license_number)
+                licenses['license_name'].append(license_name)
+                licenses['license_url'].append(license_url)
+
+        self.data = licenses
 
     def transform(self):
         self.add_licenses()
@@ -143,8 +164,27 @@ class ImageTable(Entity):
         self.licenses = licenses
 
     def add_images(self):
-        # TODO: implement this
-        pass
+        images = self.create_data_dict()
+        for plant in self.data:
+            image_data = plant.get('images')
+            if image_data:
+                original_url = image_data.get('original_url')
+                regular_url = image_data.get('regular_url')
+                medium_url = image_data.get('medium_url')
+                small_url = image_data.get('small_url')
+                thumbnail = image_data.get('thumbnail')
+                images['original_url'].append(original_url)
+                images['regular_url'].append(regular_url)
+                images['medium_url'].append(medium_url)
+                images['small_url'].append(small_url)
+                images['thumbnail'].append(thumbnail)
+
+                license_number = image_data.get('license_number')
+                if license_number in self.licenses:
+                    license_id = self.licenses.data.index(license_number)
+                    images['license_id'].append(license_id)
+
+        self.data = images
 
     def transform(self):
         self.add_images()
@@ -158,8 +198,24 @@ class SpeciesTable(Entity):
         self.images = images
 
     def add_species(self):
-        # TODO: implement this
-        pass
+        species = self.create_data_dict()
+
+        for plant in self.data:
+            name = plant.get('name')
+            scientific_name = plant.get('scientific_name')
+            species['name'].append(name)
+            species['scientific_name'].append(scientific_name)
+
+            image_data = plant.get('images'):
+            if image_data:
+                original_url = image_data.get('original_url')
+                image_id = self.images.data.index(original_url)
+                species['image_id'].append(image_id)
+
+            else:
+                species['image_id'].append(None)
+
+        self.data = species
 
     def transform(self):
         self.add_species()
