@@ -1,8 +1,10 @@
+# pylint: disable=c-extension-no-member
+
 """Loads all local table data and uploads them to the RDS"""
-import pyodbc
 from os import environ
 from dotenv import load_dotenv
 import pandas as pd
+import pyodbc
 
 DATA_FILEPATH = './data/clean_data/'
 CSV_FILETYPE = '.csv'
@@ -23,11 +25,11 @@ def get_db_connection() -> pyodbc.Connection:
     """Returns a live connection to the database"""
     load_dotenv()
     conn = pyodbc.connect(
-        f'DRIVER={{ODBC Driver 18 for SQL Server}};'
-        f'SERVER={environ['DB_HOST']}, {environ['DB_PORT']};'
-        f'DATABASE={environ['DB_NAME']};'
-        f'UID={environ['DB_USER']};'
-        f'PWD={environ['DB_PASSWORD']};'
+        f"DRIVER={{ODBC Driver 18 for SQL Server}};"
+        f"SERVER={environ['DB_HOST']}, {environ['DB_PORT']};"
+        f"DATABASE={environ['DB_NAME']};"
+        f"UID={environ['DB_USER']};"
+        f"PWD={environ['DB_PASSWORD']};"
         'TrustServerCertificate=yes;'
     )
 
@@ -58,6 +60,6 @@ def upload_table_data(conn: pyodbc.Connection, table_name: str, df: pd.DataFrame
 
 if __name__ == '__main__':
     with get_db_connection() as connection:
-        for table_name in TABLE_NAMES:
-            table_df = load_csv(table_name)
-            upload_table_data(connection, table_name, table_df)
+        for table in TABLE_NAMES:
+            table_df = load_csv(table)
+            upload_table_data(connection, table, table_df)
