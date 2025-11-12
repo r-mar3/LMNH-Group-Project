@@ -52,6 +52,10 @@ def save_to_json(data: list[dict]) -> None:
 
 
 def check_new_endpoints() -> int:
+    """
+    Checks file storing the max endpoint
+    and updates it if more valid enpoints are found
+    """
     if not os.path.exists(MAX_ENDPOINT_PATH):
         os.makedirs(MAX_ENDPOINT_PATH)
         with open(MAX_ENDPOINT_FILE, 'w', encoding='utf-8') as f:
