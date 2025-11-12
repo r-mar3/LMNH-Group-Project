@@ -16,6 +16,30 @@
 # Architecture Diagram:
 ![alt text](architecture.png)
 
+# User Stories
+
+## Hi, I'm a Gardener.
+
+- I want to be alerted if I need to water the plants.
+- Why? Because I don't want my plants to die.
+
+- I want to be alerted if the soil moisture is a concerning value (far outside average for a specific plant).
+- Why? Because I don't want my plants to die.
+
+- I want to be alerted if the temperature of a plant is a concerning value (far outside average for a specific plant).
+- Why? Because I don't want my plants to die.
+
+## Hi, I'm a Technician who helped setup the raspberry pi sensors.
+
+- I want to make sure the sensors are working by visualising the live data they capture every minute
+- Why?
+> error, recording taken
+
+## Hi, I'm Financially invested in the museum.
+
+- I want to see what plants are cheaper / require less water to maintain (soil_moisture)
+- Which botanists are recoding the most readings?
+
 # Credits:
 - Adam Cummings: Engineer & Analyst, Architect & DevOps
 - Sami Lachqar: Engineer & Analyst, Architect & DevOps
