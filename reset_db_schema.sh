@@ -1,0 +1,1 @@
+sqlcmd -S c20-plants-db.c57vkec7dkkx.eu-west-2.rds.amazonaws.com -d plants -U beta -P pswd-beta1 -i schema.sql -C
