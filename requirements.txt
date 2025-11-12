@@ -3,3 +3,4 @@ dotenv
 requests
 pytest
 pylint
+streamlit
