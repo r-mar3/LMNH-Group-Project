@@ -7,15 +7,16 @@ from pandas import DataFrame
 from pprint import pprint
 
 INPUT_FILE = './data/raw_data/plant_data_raw.json'
-OUTPUT_FOLDER = './data//clean_data/'
+OUTPUT_FOLDER = './data/clean_data/'
 
 
 class Entity:
-    def __init__(self, data: list[dict], column_id: str, column_names: list[str], filename: str) -> None:
-        self.data = data
+    def __init__(self, raw_data: list[dict], column_id: str, column_names: list[str], filename: str) -> None:
+        self.raw_data = raw_data
         self.column_id = column_id
         self.column_names = column_names
         self.filename = filename
+        self.data = {}
 
     def create_data_dict(self):
         return {column_name: [] for column_name in self.column_names}
@@ -30,21 +31,21 @@ class Entity:
         return data
 
     def transform(self) -> pd.DataFrame:
-        print(self.create_dataframe())
-        # cleaned_data = self.clean_data(data)
-        # self.save_to_file(cleaned_data)
+        data = self.create_dataframe()
+        cleaned_data = self.clean_data(data)
+        self.save_to_file(cleaned_data)
 
 
 class CountryTable(Entity):
-    def __init__(self, data: list[dict]) -> None:
-        super().__init__(data, 'country_id', [
+    def __init__(self, raw_data: list[dict]) -> None:
+        super().__init__(raw_data, 'country_id', [
             'country_name'], f'{OUTPUT_FOLDER}country.csv')
 
     def add_countries(self) -> None:
         """Add country to self"""
         countries = self.create_data_dict()
 
-        for plant in self.data:
+        for plant in self.raw_data:
             origin_data = plant.get('origin_location')
             if origin_data:
                 country_name = origin_data.get('country')
@@ -61,8 +62,8 @@ class CountryTable(Entity):
 
 
 class CityTable(Entity):
-    def __init__(self, data: list[dict], countries: CountryTable) -> None:
-        super().__init__(data, 'city_id', [
+    def __init__(self, raw_data: list[dict], countries: CountryTable) -> None:
+        super().__init__(raw_data, 'city_id', [
             'city_name', 'country_id'], f'{OUTPUT_FOLDER}city.csv')
         self.countries = countries
 
@@ -70,7 +71,7 @@ class CityTable(Entity):
         """Add city to self"""
         cities = self.create_data_dict()
 
-        for plant in self.data:
+        for plant in self.raw_data:
             origin_data = plant.get('origin_location')
             if origin_data:
                 city_name = origin_data.get('city')
@@ -93,8 +94,8 @@ class CityTable(Entity):
 
 
 class OriginTable(Entity):
-    def __init__(self, data: list[dict], cities: CityTable) -> None:
-        super().__init__(data, 'origin_id', [
+    def __init__(self, raw_data: list[dict], cities: CityTable) -> None:
+        super().__init__(raw_data, 'origin_id', [
             'latitude', 'longitude', 'coords_combined', 'city_id'], f'{OUTPUT_FOLDER}origin.csv')
         self.cities = cities
 
@@ -102,7 +103,7 @@ class OriginTable(Entity):
         """Add origin to self"""
         origins = self.create_data_dict()
 
-        for plant in self.data:
+        for plant in self.raw_data:
             origin_data = plant.get('origin_location')
             if origin_data:
                 latitude = origin_data.get('latitude')
@@ -128,14 +129,14 @@ class OriginTable(Entity):
 
 
 class BotanistTable(Entity):
-    def __init__(self, data: list[dict]):
-        super().__init__(data, 'botanist_id', [
+    def __init__(self, raw_data: list[dict]):
+        super().__init__(raw_data, 'botanist_id', [
             'name', 'email', 'phone'], f'{OUTPUT_FOLDER}botanist.csv')
 
     def add_botanists(self):
         botanists = self.create_data_dict()
 
-        for plant in self.data:
+        for plant in self.raw_data:
             botanist_data = plant.get('botanist')
             if botanist_data:
                 name = botanist_data.get('name')
@@ -153,13 +154,13 @@ class BotanistTable(Entity):
 
 
 class LicenseTable(Entity):
-    def __init__(self, data: list[dict]):
-        super().__init__(data, 'license_id', [
+    def __init__(self, raw_data: list[dict]):
+        super().__init__(raw_data, 'license_id', [
             'license_number', 'license_name', 'license_url'], f'{OUTPUT_FOLDER}license.csv')
 
     def add_licenses(self):
         licenses = self.create_data_dict()
-        for plant in self.data:
+        for plant in self.raw_data:
             image_data = plant.get('images')
             if image_data:
                 license_number = image_data.get('license')
@@ -177,8 +178,8 @@ class LicenseTable(Entity):
 
 
 class ImageTable(Entity):
-    def __init__(self, data: list[dict], licenses: LicenseTable):
-        super().__init__(data, 'image_id', [
+    def __init__(self, raw_data: list[dict], licenses: LicenseTable):
+        super().__init__(raw_data, 'image_id', [
             'original_url', 'regular_url',
             'medium_url', 'small_url',
             'thumbnail', 'license_id'], f'{OUTPUT_FOLDER}image.csv')
@@ -186,7 +187,7 @@ class ImageTable(Entity):
 
     def add_images(self):
         images = self.create_data_dict()
-        for plant in self.data:
+        for plant in self.raw_data:
             image_data = plant.get('images')
             if image_data:
                 original_url = image_data.get('original_url')
@@ -217,15 +218,15 @@ class ImageTable(Entity):
 
 
 class SpeciesTable(Entity):
-    def __init__(self, data: list[dict], images: ImageTable):
-        super().__init__(data, 'species_id', [
+    def __init__(self, raw_data: list[dict], images: ImageTable):
+        super().__init__(raw_data, 'species_id', [
             'name', 'scientific_name', 'image_id'], f'{OUTPUT_FOLDER}species.csv')
         self.images = images
 
     def add_species(self):
         species = self.create_data_dict()
 
-        for plant in self.data:
+        for plant in self.raw_data:
             name = plant.get('name')
             scientific_name = plant.get('scientific_name')
             species['name'].append(name)
@@ -248,16 +249,16 @@ class SpeciesTable(Entity):
 
 
 class PlantTable(Entity):
-    def __init__(self, data: list[dict], species: SpeciesTable, origins: OriginTable):
-        super().__init__(data, 'index', [
-            'plant_id', 'species_id', 'origin_id'], f'{OUTPUT_FOLDER}license.csv')
+    def __init__(self, raw_data: list[dict], species: SpeciesTable, origins: OriginTable):
+        super().__init__(raw_data, 'index', [
+            'plant_id', 'species_id', 'origin_id'], f'{OUTPUT_FOLDER}plant.csv')
         self.species = species
         self.origins = origins
 
     def add_plants(self):
         plants = self.create_data_dict()
 
-        for plant in self.data:
+        for plant in self.raw_data:
             plant_id = plant.get('plant_id')
             plants['plant_id'].append(plant_id)
 
@@ -280,24 +281,26 @@ class PlantTable(Entity):
                 else:
                     plants['origin_id'].append(None)
 
+        self.data = plants
+
     def transform(self):
         self.add_plants()
         return super().transform()
 
 
 class ReadingTable(Entity):
-    def __init__(self, data: list[dict], botanists: BotanistTable, plants: PlantTable):
-        super().__init__(data, 'reading_id', [
+    def __init__(self, raw_data: list[dict], botanists: BotanistTable, plants: PlantTable):
+        super().__init__(raw_data, 'reading_id', [
             'last_watered', 'recording_taken',
             'soil_moisture', 'temperature',
-            'botanist_id', 'plant_id'], f'{OUTPUT_FOLDER}license.csv')
+            'botanist_id', 'plant_id'], f'{OUTPUT_FOLDER}reading.csv')
         self.botanists = botanists
         self.plants = plants
 
     def add_readings(self):
         readings = self.create_data_dict()
 
-        for plant in self.data:
+        for plant in self.raw_data:
             last_watered = plant.get('last_watered')
             if last_watered:
                 readings['last_watered'].append(last_watered)
@@ -333,7 +336,6 @@ class ReadingTable(Entity):
                 readings['botanist_id'].append(None)
 
             plant_id = plant.get('plant_id')
-            print(f'PLANT_ID: {plant_id}')
             if plant_id:
                 readings['plant_id'].append(plant_id)
             else:
@@ -364,6 +366,7 @@ if __name__ == "__main__":
     setup_output()
     data = get_data()
     countries = CountryTable(data)
+    countries.transform()
     botanists = BotanistTable(data)
     botanists.transform()
     licenses = LicenseTable(data)
