@@ -20,9 +20,19 @@ class Entity:
     def create_data_dict(self):
         return {column_name: [] for column_name in self.column_names}
 
-    def transform(self) -> None:
-        df = pd.DataFrame(self.data, columns=self.column_names)
-        df.to_csv(self.filename, index_label=self.column_id)
+    def create_dataframe(self) -> pd.DataFrame:
+        return pd.DataFrame(self.data, columns=self.column_names)
+
+    def save_to_file(self, data: pd.DataFrame) -> None:
+        data.to_csv(self.filename, index_label=self.column_id)
+
+    def clean_data(self, data: pd.DataFrame) -> pd.DataFrame:
+        return data
+
+    def transform(self) -> pd.DataFrame:
+        print(self.create_dataframe())
+        # cleaned_data = self.clean_data(data)
+        # self.save_to_file(cleaned_data)
 
 
 class CountryTable(Entity):
@@ -39,6 +49,9 @@ class CountryTable(Entity):
             if origin_data:
                 country_name = origin_data.get('country')
                 countries['country_name'].append(country_name)
+
+            else:
+                countries['country_name'].append(None)
 
         self.data = countries
 
@@ -64,9 +77,13 @@ class CityTable(Entity):
                 country_name = origin_data.get('country')
                 cities['city_name'].append(city_name)
 
-                if country_name in self.countries['country_name']:
-                    country_id = self.countries.data.index(country_name)
+                if country_name in self.countries.data['country_name']:
+                    country_id = self.countries.data['country_name'].index(
+                        country_name)
                     cities['country_id'].append(country_id)
+
+                else:
+                    cities['country_id'].append(None)
 
         self.data = cities
 
@@ -76,10 +93,9 @@ class CityTable(Entity):
 
 
 class OriginTable(Entity):
-    # FINISH ME AAAAAAAAHHHHHHHH!!!!!!!
     def __init__(self, data: list[dict], cities: CityTable) -> None:
         super().__init__(data, 'origin_id', [
-            'longitude', 'latitude', 'city_id'], f'{OUTPUT_FOLDER}origin.csv')
+            'latitude', 'longitude', 'coords_combined', 'city_id'], f'{OUTPUT_FOLDER}origin.csv')
         self.cities = cities
 
     def add_origins(self) -> None:
@@ -89,15 +105,20 @@ class OriginTable(Entity):
         for plant in self.data:
             origin_data = plant.get('origin_location')
             if origin_data:
-                longitude = origin_data.get('longitude')
                 latitude = origin_data.get('latitude')
-                origins['longitude'].append(longitude)
+                longitude = origin_data.get('longitude')
+                coords_combined = f'{latitude} {longitude}'
                 origins['latitude'].append(latitude)
+                origins['longitude'].append(longitude)
+                origins['coords_combined'].append(coords_combined)
                 city_name = origin_data.get('city')
 
-                if city_name in cities['city_name']:
-                    city_id = cities.data.index(city_name)
+                if city_name in self.cities.data['city_name']:
+                    city_id = cities.data['city_name'].index(city_name)
                     origins['city_id'].append(city_id)
+
+                else:
+                    origins['city_id'].append(None)
 
         self.data = origins
 
@@ -180,9 +201,13 @@ class ImageTable(Entity):
                 images['thumbnail'].append(thumbnail)
 
                 license_number = image_data.get('license_number')
-                if license_number in self.licenses:
-                    license_id = self.licenses.data.index(license_number)
+                if license_number in self.licenses.data['license_number']:
+                    license_id = self.licenses.data['license_number'].index(
+                        license_number)
                     images['license_id'].append(license_id)
+
+                else:
+                    images['license_id'].append(None)
 
         self.data = images
 
@@ -206,10 +231,10 @@ class SpeciesTable(Entity):
             species['name'].append(name)
             species['scientific_name'].append(scientific_name)
 
-            image_data = plant.get('images'):
+            image_data = plant.get('images')
             if image_data:
                 original_url = image_data.get('original_url')
-                image_id = self.images.data.index(original_url)
+                image_id = self.images.data['original_url'].index(original_url)
                 species['image_id'].append(image_id)
 
             else:
@@ -224,8 +249,8 @@ class SpeciesTable(Entity):
 
 class PlantTable(Entity):
     def __init__(self, data: list[dict], species: SpeciesTable, origins: OriginTable):
-        super().__init__(data, 'plant_id', [
-            'species_id', 'origin_id'], f'{OUTPUT_FOLDER}license.csv')
+        super().__init__(data, 'index', [
+            'plant_id', 'species_id', 'origin_id'], f'{OUTPUT_FOLDER}license.csv')
         self.species = species
         self.origins = origins
 
@@ -233,10 +258,27 @@ class PlantTable(Entity):
         plants = self.create_data_dict()
 
         for plant in self.data:
+            plant_id = plant.get('plant_id')
+            plants['plant_id'].append(plant_id)
+
             scientific_name = plant.get('scientfic_name')
-            if scientific_name in self.species['scientific_name']:
-                species_id = self.species.data.index(scientific_name)
+            if scientific_name in self.species.data['scientific_name']:
+                species_id = self.species.data['scientific_name'].index(
+                    scientific_name)
                 plants['species_id'].append(species_id)
+
+            origin_data = plant.get('origin_location')
+            if origin_data:
+                latitude = origin_data.get('latitude')
+                longitude = origin_data.get('longitude')
+                coords_combined = f'{latitude} {longitude}'
+                if coords_combined in self.origins.data['coords_combined']:
+                    origin_id = self.origins.data['coords_combined'].index(
+                        coords_combined)
+                    plants['origin_id'].append(origin_id)
+
+                else:
+                    plants['origin_id'].append(None)
 
     def transform(self):
         self.add_plants()
@@ -253,8 +295,51 @@ class ReadingTable(Entity):
         self.plants = plants
 
     def add_readings(self):
-        # TODO: implement this
-        pass
+        readings = self.create_data_dict()
+
+        for plant in self.data:
+            last_watered = plant.get('last_watered')
+            if last_watered:
+                readings['last_watered'].append(last_watered)
+            else:
+                readings['last_watered'].append(None)
+
+            recording_taken = plant.get('recording_taken')
+            if recording_taken:
+                readings['recording_taken'].append(recording_taken)
+            else:
+                readings['recording_taken'].append(None)
+
+            soil_moisture = plant.get('soil_moisture')
+            if soil_moisture:
+                readings['soil_moisture'].append(soil_moisture)
+            else:
+                readings['soil_moisture'].append(None)
+
+            temperature = plant.get('temperature')
+            if temperature:
+                readings['temperature'].append(temperature)
+            else:
+                readings['temperature'].append(None)
+
+            botanist_data = plant.get('botanist')
+            if botanist_data:
+                email = botanist_data.get('email')
+                if email in self.botanists.data['email']:
+                    botanist_id = self.botanists.data['email'].index(email)
+                    readings['botanist_id'].append(botanist_id)
+
+            else:
+                readings['botanist_id'].append(None)
+
+            plant_id = plant.get('plant_id')
+            print(f'PLANT_ID: {plant_id}')
+            if plant_id:
+                readings['plant_id'].append(plant_id)
+            else:
+                readings['plant_id'].append(None)
+
+        self.data = readings
 
     def transform(self):
         self.add_readings()
@@ -279,20 +364,19 @@ if __name__ == "__main__":
     setup_output()
     data = get_data()
     countries = CountryTable(data)
-    countries.transform()
-    # botanists = BotanistTable(plants)
-    # botanists.transform()
-    # licenses = LicenseTable(data)
-    # licenses.transform()
+    botanists = BotanistTable(data)
+    botanists.transform()
+    licenses = LicenseTable(data)
+    licenses.transform()
     cities = CityTable(data, countries)
     cities.transform()
     origins = OriginTable(data, cities)
     origins.transform()
-    # images = ImageTable(data, licences)
-    # images.transform()
-    # species = SpeciesTable(data, images)
-    # species.transform()
-    # plants = PlantTable(data, species, origins)
-    # plants.transform()
-    # readings = ReadingTable(data, plants, botanists)
-    # readings.transform()
+    images = ImageTable(data, licenses)
+    images.transform()
+    species = SpeciesTable(data, images)
+    species.transform()
+    plants = PlantTable(data, species, origins)
+    plants.transform()
+    readings = ReadingTable(data, botanists, plants)
+    readings.transform()
