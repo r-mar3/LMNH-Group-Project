@@ -1,0 +1,9 @@
+.terraform
+
+.venv
+
+*.pem
+*.pemkey
+
+.tfvars
+terraform.tfvars
