@@ -4,12 +4,17 @@ import json
 import logging
 import argparse
 import os
+import multiprocessing
 import requests as req
+import time
 
 BASE_URL = 'http://sigma-labs-bot.herokuapp.com/api/plants/'
 OUTPUT_FOLDER = './data/raw_data/'
 OUTPUT_FILE = f'{OUTPUT_FOLDER}plant_data_raw.json'
-MAX_CONSECUTIVE_FAILURES = 10
+BASE_NUM_ENDPOINTS = 50
+MAX_ENDPOINT_PATH = './data/endpoint/'
+MAX_ENDPOINT_FILE = f'{MAX_ENDPOINT_PATH}endpoint.txt'
+NUM_PROCESSES = 32
 
 
 def set_up_logging() -> None:
@@ -31,12 +36,10 @@ def fetch_data_by_id(plant_id: int) -> dict:
     """Returns a dict with status code and response data"""
     response = req.get(f"{BASE_URL}{plant_id}", timeout=5)
 
-    body = response.json()
     status_code = response.status_code
-    if status_code == 404:
-        raise ValueError
+    body = response.json()
 
-    return body
+    return {'status_code': status_code, 'body': body}
 
 
 def save_to_json(data: list[dict]) -> None:
@@ -48,24 +51,40 @@ def save_to_json(data: list[dict]) -> None:
         json.dump(data, f, indent=4)
 
 
+def check_new_endpoints() -> int:
+    if not os.path.exists(MAX_ENDPOINT_PATH):
+        os.makedirs(MAX_ENDPOINT_PATH)
+        with open(MAX_ENDPOINT_FILE, 'w', encoding='utf-8') as f:
+            f.write(str(BASE_NUM_ENDPOINTS))
+
+        return BASE_NUM_ENDPOINTS
+
+    with open(MAX_ENDPOINT_FILE, 'r+', encoding='utf-8') as f:
+        current_max_endpoint = int(f.read())
+
+    with multiprocessing.Pool(NUM_PROCESSES) as pool:
+        data = pool.map(fetch_data_by_id, range(
+            current_max_endpoint, current_max_endpoint + 5))
+
+        for endpoint in data:
+            if endpoint.get('status_code') == 200:
+
+
 def extract_data() -> None:
     """Runs the extract functions for all ids and catches error"""
     data = []
-    consecutive_invalid_ids = 0
-    current_id = 1
-    while True:
-        if consecutive_invalid_ids >= MAX_CONSECUTIVE_FAILURES:
-            break
-        try:
-            data.append(fetch_data_by_id(current_id))
-            consecutive_invalid_ids = 0
-        except ValueError:
-            logging.error(f"Plant with id '{current_id}' was not found")
-            consecutive_invalid_ids += 1
-        finally:
-            current_id += 1
+    start_time = time.time()
+    with multiprocessing.Pool(NUM_PROCESSES) as pool:
+        data = pool.map(fetch_data_by_id, range(1, MAX_ENDPOINT + 1))
 
-    save_to_json(data)
+    successful_data = [
+        response.get('body') for response in data if response.get('status_code') == 200]
+
+    end_time = time.time()
+
+    print(f'Time taken = {end_time - start_time}')
+
+    save_to_json(successful_data)
 
 
 if __name__ == "__main__":
