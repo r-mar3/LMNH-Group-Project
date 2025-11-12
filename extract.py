@@ -66,16 +66,18 @@ def check_new_endpoints() -> int:
         data = pool.map(fetch_data_by_id, range(
             current_max_endpoint, current_max_endpoint + 5))
 
-        for endpoint in data:
-            if endpoint.get('status_code') == 200:
+    for endpoint in data:
+        if endpoint.get('status_code') == 200:
+            return current_max_endpoint + 5
 
 
 def extract_data() -> None:
     """Runs the extract functions for all ids and catches error"""
     data = []
+    max_endpoint = check_new_endpoints()
     start_time = time.time()
     with multiprocessing.Pool(NUM_PROCESSES) as pool:
-        data = pool.map(fetch_data_by_id, range(1, MAX_ENDPOINT + 1))
+        data = pool.map(fetch_data_by_id, range(1, max_endpoint + 1))
 
     successful_data = [
         response.get('body') for response in data if response.get('status_code') == 200]
