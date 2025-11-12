@@ -65,7 +65,7 @@ class CityTable(Entity):
                 cities['city_name'].append(city_name)
 
                 if country_name in self.countries['country_name']:
-                    country_id = countries.data.index(country_name)
+                    country_id = self.countries.data.index(country_name)
                     cities['country_id'].append(country_id)
 
         self.data = cities
@@ -229,9 +229,14 @@ class PlantTable(Entity):
         self.species = species
         self.origins = origins
 
-    def add_licenses(self):
-        # TODO: implement this
-        pass
+    def add_plants(self):
+        plants = self.create_data_dict()
+
+        for plant in self.data:
+            scientific_name = plant.get('scientfic_name')
+            if scientific_name in self.species['scientific_name']:
+                species_id = self.species.data.index(scientific_name)
+                plants['species_id'].append(species_id)
 
     def transform(self):
         self.add_plants()
