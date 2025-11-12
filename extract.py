@@ -9,8 +9,7 @@ import requests as req
 BASE_URL = 'http://sigma-labs-bot.herokuapp.com/api/plants/'
 OUTPUT_FOLDER = './data/raw_data/'
 OUTPUT_FILE = f'{OUTPUT_FOLDER}plant_data_raw.json'
-
-SEARCH_RANGE_MAX = 51
+MAX_CONSECUTIVE_FAILURES = 10
 
 
 def set_up_logging() -> None:
@@ -52,11 +51,19 @@ def save_to_json(data: list[dict]) -> None:
 def extract_data() -> None:
     """Runs the extract functions for all ids and catches error"""
     data = []
-    for i in range(1, SEARCH_RANGE_MAX):
+    consecutive_invalid_ids = 0
+    current_id = 1
+    while True:
+        if consecutive_invalid_ids >= MAX_CONSECUTIVE_FAILURES:
+            break
         try:
-            data.append(fetch_data_by_id(i))
+            data.append(fetch_data_by_id(current_id))
+            consecutive_invalid_ids = 0
         except ValueError:
-            logging.error(f"Plant with id '{i}' was not found")
+            logging.error(f"Plant with id '{current_id}' was not found")
+            consecutive_invalid_ids += 1
+        finally:
+            current_id += 1
 
     save_to_json(data)
 
