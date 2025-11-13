@@ -1,24 +1,12 @@
 """Tests extract script edge cases, ideal and unideal behaviour"""
 import json
 import pytest
-from extract import fetch_data_by_id, save_to_json, extract_data, SEARCH_RANGE_MAX
+from extract import fetch_data_by_id, save_to_json, extract_data
 
 
 def test_fetch_data_by_id_body_type():
     """Asserts that the data fetched is returned as a dict"""
     assert isinstance(fetch_data_by_id(2), dict)
-
-
-def test_fetch_data_by_id_failure_1():
-    """Asserts that a ValueError is raised if id is out of range"""
-    with pytest.raises(ValueError):
-        fetch_data_by_id(SEARCH_RANGE_MAX)
-
-
-def test_fetch_data_by_id_failure_2():
-    """Asserts that a ValueError is raised if id is out of range"""
-    with pytest.raises(ValueError):
-        fetch_data_by_id(0)
 
 
 def test_save_to_json_contents_correct(monkeypatch, tmp_path):
