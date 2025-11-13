@@ -61,7 +61,7 @@ CREATE TABLE species (
 );
 
 CREATE TABLE plant (
-    plant_id INT IDENTITY (1,1),
+    plant_id INT UNIQUE,
     origin_id INT,
     species_id INT,
     PRIMARY KEY (plant_id),
@@ -79,11 +79,12 @@ CREATE TABLE botanist (
 
 CREATE TABLE reading (
     reading_id INT IDENTITY(1, 1),
-    reading_last_watered DATETIME, -- plants can be watered at the same time
-    reading_time_taken DATETIME, -- plants can be read at the same time
+    reading_last_watered DATETIME2, -- plants can be watered at the same time
+    reading_time_taken DATETIME2, -- plants can be read at the same time
     reading_soil_moisture FLOAT, -- plants can be equally moist
     reading_temperature FLOAT, -- plants can be equally hot or cold
-    reading_error TEXT,
+    reading_error BIT,
+    reading_alert BIT,
     botanist_id INT,
     plant_id INT,
     PRIMARY KEY (reading_id),
