@@ -1,7 +1,12 @@
 # LMNH-Group-Project 
 
 # Project Description:
-> Purpose of the project
+This project was built for the Liverpool Natural History Museum (LMNH) to aid them in monitoring the health of the plants
+found in their botanical wing. The LMNH has gardeners who are responsible for monitoring the plant health, but due to the number of plants with varying
+condition needs, monitoring can be very challenging. 
+
+In order to combat the challenges they are facing, we have built an automated pipeline which extracts data on various environmental factors about each plant (inc. NAME THE FACTORS) from XYZ.
+
 
 # How the project works:
 > How does this project work? What does the code DO?
