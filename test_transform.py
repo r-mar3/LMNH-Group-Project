@@ -109,7 +109,7 @@ def test_load_data(monkeypatch, tmp_path, fake_data):
     tmp_file = tmp_path / "fake_data.json"
     monkeypatch.setattr("transform.INPUT_PATH", tmp_file)
 
-    with open(tmp_file, "w", encoding="utf-8") as f:
+    with open(tmp_file, "w+", encoding="utf-8") as f:
         json.dump(fake_data, f)
 
     test_dataframe = load_data()
@@ -122,7 +122,7 @@ def test_load_data_row_count(monkeypatch, tmp_path, fake_data):
     tmp_file = tmp_path / "fake_data.json"
     monkeypatch.setattr("transform.INPUT_PATH", tmp_file)
 
-    with open(tmp_file, "w", encoding="utf-8") as f:
+    with open(tmp_file, "w+", encoding="utf-8") as f:
         json.dump(fake_data, f)
 
     test_dataframe = load_data()
@@ -136,7 +136,7 @@ def test_load_data_all_columns_exist(monkeypatch, tmp_path, fake_data):
     tmp_file = tmp_path / "fake_data.json"
     monkeypatch.setattr("transform.INPUT_PATH", tmp_file)
 
-    with open(tmp_file, "w", encoding="utf-8") as f:
+    with open(tmp_file, "w+", encoding="utf-8") as f:
         json.dump(fake_data, f)
 
     expected_columns = [
