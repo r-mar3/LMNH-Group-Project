@@ -74,6 +74,8 @@ def check_new_endpoints() -> int:
 
 def extract_data() -> None:
     """Runs the extract functions for all ids and catches error"""
+    start_time = time.time()
+    set_up_logging()
     data = []
     max_endpoint = check_new_endpoints()
     with multiprocessing.Pool(NUM_PROCESSES_FETCH) as pool:
@@ -83,12 +85,10 @@ def extract_data() -> None:
         response.get('body') for response in data if response.get('status_code') == 200]
 
     save_to_json(successful_data)
-
-
-if __name__ == "__main__":
-    start_time = time.time()
-    set_up_logging()
-    extract_data()
     end_time = time.time()
     time_taken = end_time - start_time
     logging.info('Time taken = %s', time_taken)
+
+
+if __name__ == "__main__":
+    extract_data()
