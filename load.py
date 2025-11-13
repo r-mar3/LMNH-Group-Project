@@ -57,7 +57,7 @@ FOREIGN_TABLES = [
     },
     {
         'table_name': 'reading',
-        'columns': ['reading_last_watered', 'reading_time_taken', 'reading_soil_moisture', 'reading_temperature', 'reading_error', 'plant_id', 'botanist_id'],
+        'columns': ['reading_last_watered', 'reading_time_taken', 'reading_soil_moisture', 'reading_temperature', 'reading_error', 'reading_alert', 'plant_id', 'botanist_id'],
         'unique_column': 'reading_time_taken'
     }
 
@@ -93,11 +93,9 @@ def upload_table_data_with_foreign_key(conn: pyodbc.Connection, table_dict: dict
         # column names which only appear in this table
         local = [col for col in columns if not col.endswith(
             '_id') or col == 'plant_id']
-        # local_names = ', '.join(local)
         # foreign table names which are mentioned
         all_foreign_keys = [
             col for col in columns if col.endswith('_id') and col != 'plant_id']
-        # all_foreign_names = [col.replace('_id', '') for col in all_foreign_keys]
 
     column_placeholders = ', '.join('?' for _ in local)
     table_name = table_dict['table_name']

@@ -83,7 +83,8 @@ CREATE TABLE reading (
     reading_time_taken DATETIME2, -- plants can be read at the same time
     reading_soil_moisture FLOAT, -- plants can be equally moist
     reading_temperature FLOAT, -- plants can be equally hot or cold
-    reading_error TEXT,
+    reading_error BIT,
+    reading_alert BIT,
     botanist_id INT,
     plant_id INT,
     PRIMARY KEY (reading_id),
