@@ -47,17 +47,20 @@ def upload_table_data(conn: pyodbc.Connection, table_name: str, df: pd.DataFrame
     sql_query = f"""
         INSERT INTO
             {table_name} ({column_names})
-        SELECT 
-            ({column_placeholders})
-        WHERE NOT EXISTS 
+        SELECT
+            {column_placeholders}
+        WHERE NOT EXISTS
             (SELECT 1 FROM {table_name} WHERE {unique_col} = ?)
         ;
     """
-    df = df.dropna()
+
+    df = df.dropna().reset_index()
 
     something_strange = []
     for index, row in enumerate(df.to_numpy()):
-        something_strange.append(tuple(np.append(row, df[unique_col][index])))
+
+        something_strange.append(
+            tuple(np.append(row[1:], df[unique_col][index])))
 
     cur = conn.cursor()
     cur.executemany(
@@ -73,14 +76,17 @@ if __name__ == '__main__':
     columns = clean_table.columns.tolist()
 
     for tablename in BASE_TABLES:
-        tables[tablename] = [col for col in columns if tablename + '_' in col]
+        tables[tablename] = {
+            'columns': [col for col in columns if tablename + '_' in col],
+            'unique': [col for col in columns if '_name' in col]
+        }
 
-    for tablename in FOREIGN_TABLES:  # add a list of foreign col names for add 'foreign'+_id
-        tables[tablename] = [col for col in columns if tablename + '_' in col]
+    # for tablename in FOREIGN_TABLES:  # add a list of foreign col names for add 'foreign'+_id
+    #     tables[tablename] = [col for col in columns if tablename + '_' in col]
 
     with get_db_connection() as connection:
         # add base tables with auto generated ids
         for table_name, columns in tables.items():
+
             upload_table_data(connection, table_name,
-                              clean_table[columns], unique_col='country_name')
-            break
+                              clean_table[columns], unique_col=)
