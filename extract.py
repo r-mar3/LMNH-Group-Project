@@ -56,12 +56,11 @@ def check_new_endpoints() -> int:
     Checks file storing the max endpoint
     and updates it if more valid enpoints are found
     """
-    if not os.path.exists(MAX_ENDPOINT_PATH):
-        os.makedirs(MAX_ENDPOINT_PATH)
+    if not os.path.exists(MAX_ENDPOINT_FILE):
+        if not os.path.exists(MAX_ENDPOINT_PATH):
+            os.makedirs(MAX_ENDPOINT_PATH)
         with open(MAX_ENDPOINT_FILE, 'w', encoding='utf-8') as f:
             f.write(str(BASE_NUM_ENDPOINTS))
-
-        return BASE_NUM_ENDPOINTS
 
     with open(MAX_ENDPOINT_FILE, 'r+', encoding='utf-8') as f:
         current_max_endpoint = int(f.read())
@@ -72,27 +71,33 @@ def check_new_endpoints() -> int:
 
     for endpoint in data:
         if endpoint.get('status_code') == 200:
-            return current_max_endpoint + 5
+            current_max_endpoint += 5
+
+            with open(MAX_ENDPOINT_FILE, 'w', encoding='utf-8') as f:
+                f.write(str(current_max_endpoint))
+
+            current_max_endpoint = check_new_endpoints()
+            break
+
+    return current_max_endpoint
 
 
 def extract_data() -> None:
     """Runs the extract functions for all ids and catches error"""
     data = []
     max_endpoint = check_new_endpoints()
-    start_time = time.time()
     with multiprocessing.Pool(NUM_PROCESSES) as pool:
         data = pool.map(fetch_data_by_id, range(1, max_endpoint + 1))
 
     successful_data = [
         response.get('body') for response in data if response.get('status_code') == 200]
 
-    end_time = time.time()
-
-    print(f'Time taken = {end_time - start_time}')
-
     save_to_json(successful_data)
 
 
 if __name__ == "__main__":
+    start_time = time.time()
     set_up_logging()
     extract_data()
+    end_time = time.time()
+    print(f'Time taken = {end_time - start_time}')
