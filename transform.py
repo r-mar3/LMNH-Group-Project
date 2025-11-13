@@ -18,7 +18,7 @@ class Entity:
         self.filename = filename
         self.data = {}
 
-    def create_data_dict(self):
+    def create_data_dict(self) -> dict[str:list]:
         return {column_name: [] for column_name in self.column_names}
 
     def create_dataframe(self) -> pd.DataFrame:
@@ -95,8 +95,9 @@ class CityTable(Entity):
 
 class OriginTable(Entity):
     def __init__(self, raw_data: list[dict], cities: CityTable) -> None:
-        super().__init__(raw_data, 'origin_id', [
-            'latitude', 'longitude', 'coords_combined', 'city_id'], f'{OUTPUT_FOLDER}origin.csv')
+        super().__init__(raw_data, 'origin_id',
+                         ['latitude', 'longitude', 'coords_combined', 'city_id'],
+                         f'{OUTPUT_FOLDER}origin.csv')
         self.cities = cities
 
     def add_origins(self) -> None:

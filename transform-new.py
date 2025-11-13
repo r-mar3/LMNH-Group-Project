@@ -63,7 +63,8 @@ class TransformManager:
                 'reading_last_watered': plant.get('last_watered'),
                 'reading_time_taken': plant.get('recording_taken'),
                 'reading_soil_moisture': plant.get('soil_moisture'),
-                'reading_temperature': plant.get('temperature')
+                'reading_temperature': plant.get('temperature'),
+                'reading_error': plant.get('error')
             }
             if row.get('species_scientific_name'):
                 row['species_scientific_name'] = row['species_scientific_name'][0]
@@ -74,6 +75,7 @@ class TransformManager:
     def transform(self) -> None:
         """Execute all transform processes"""
         df = self.load_data()
+        pprint(df)
 
         countries = CountryTable(df)
         cities = CityTable(df, countries)
@@ -107,6 +109,7 @@ class BaseTable:
         self.data.insert(0, id_name, range(1, len(self.data) + 1))
 
     def clean_data(self) -> None:
+        """Acts like an abstract class, optionally implemented by subclasses"""
         pass
 
 
@@ -114,7 +117,7 @@ class CountryTable(BaseTable):
     def __init__(self, df: pd.DataFrame) -> None:
         super().__init__('country', ['country_name'])
 
-        self.data = df[['country_name']].dropna().drop_duplicates()
+        self.data = df[['country_name']].drop_duplicates()
         self.assign_ids('country_id')
 
 
@@ -122,7 +125,7 @@ class CityTable(BaseTable):
     def __init__(self, df: pd.DataFrame, countries: CountryTable) -> None:
         super().__init__('city', ['city_name', 'country_id'])
 
-        cities = df[['city_name', 'country_name']].dropna().drop_duplicates()
+        cities = df[['city_name', 'country_name']].drop_duplicates()
         self.data = cities.merge(countries.data[['country_name', 'country_id']], on='country_name',
                                  how='left').drop(columns='country_name')
         self.assign_ids('city_id')
@@ -134,8 +137,8 @@ class LicenseTable(BaseTable):
             'license_number', 'license_name', 'license_url'])
 
         licenses = df[['license_number',
-                       'license_name', 'license_url']].dropna().drop_duplicates()
-        licenses['license_number'] = licenses['license_number'].astype(int)
+                       'license_name', 'license_url']].drop_duplicates()
+        licenses['license_number'] = licenses['license_number'].astype('Int64')
         self.data = licenses
         self.assign_ids('license_id')
 
@@ -146,7 +149,7 @@ class ImageTable(BaseTable):
                                    'image_medium_url', 'image_small_url', 'image_thumbnail', 'license_id'])
 
         images = df[['image_original_url', 'image_regular_url', 'image_medium_url',
-                     'image_small_url', 'image_thumbnail_url', 'license_number']].dropna().drop_duplicates()
+                     'image_small_url', 'image_thumbnail_url', 'license_number']].drop_duplicates()
         self.data = images.merge(licenses.data[['license_number', 'license_id']], on='license_number',
                                  how='left').drop(columns=['license_number'])
         self.assign_ids('image_id')
@@ -158,7 +161,7 @@ class BotanistTable(BaseTable):
             'botanist_name', 'botanist_email', 'botanist_phone'])
 
         botanists = df[['botanist_name', 'botanist_email',
-                        'botanist_phone']].dropna().drop_duplicates()
+                        'botanist_phone']].drop_duplicates()
         # botanists['botanist_email'] = botanists['botanist_email'].str.replace(
         #     '..', '.')
         self.data = botanists
@@ -170,12 +173,12 @@ class BotanistTable(BaseTable):
 
 
 class SpeciesTable(BaseTable):
-    def __init__(self, df: pd.DataFrame, images: ImageTable):
+    def __init__(self, df: pd.DataFrame, images: ImageTable) -> None:
         super().__init__('species', ['species_name',
                                      'species_scientific_name', 'image_id'])
 
         species = df[['species_name', 'species_scientific_name',
-                      'image_original_url']].dropna().drop_duplicates()
+                      'image_original_url']].drop_duplicates()
         self.data = species.merge(images.data[['image_original_url', 'image_id']],
                                   on='image_original_url', how='left').drop(columns='image_original_url')
         self.assign_ids('species_id')
@@ -187,7 +190,7 @@ class OriginTable(BaseTable):
             'origin', ['origin_longitude', 'origin_latitude', 'city_id'])
 
         origins = df[['origin_longitude',
-                      'origin_latitude', 'city_name']].dropna().drop_duplicates()
+                      'origin_latitude', 'city_name']].drop_duplicates()
         self.data = origins.merge(cities.data[['city_name', 'city_id']], on='city_name',
                                   how='left').drop(columns='city_name')
         self.assign_ids('origin_id')
@@ -197,10 +200,11 @@ class PlantTable(BaseTable):
     def __init__(self, df: pd.DataFrame, species: SpeciesTable, origins: OriginTable) -> None:
         super().__init__('plant', ['plant_id', 'species_id', 'origin_id'])
 
-        plants = df[['plant_id', 'species_scientific_name',
+        plants = df[['plant_id', 'species_name',
                      'origin_latitude', 'origin_longitude']].dropna().drop_duplicates()
-        plants = plants.merge(species.data[['species_scientific_name', 'species_id']],
-                              on='species_scientific_name', how='left').drop(columns='species_scientific_name').dropna()
+        plants = plants.merge(species.data[['species_name', 'species_id']],
+                              on='species_name', how='left').drop(columns='species_name').dropna()
+
         plants['species_id'] = plants['species_id'].astype(int)
 
         self.data = plants.merge(origins.data[['origin_latitude', 'origin_longitude', 'origin_id']],
@@ -214,7 +218,7 @@ class ReadingTable(BaseTable):
             'reading_last_watered', 'reading_time_taken', 'reading_soil_moisture', 'reading_temperature', 'botanist_id', 'plant_id'])
 
         readings = df[['reading_last_watered', 'reading_time_taken',
-                       'reading_soil_moisture', 'reading_temperature', 'botanist_email', 'plant_id']].dropna().drop_duplicates()
+                       'reading_soil_moisture', 'reading_temperature', 'botanist_email', 'plant_id']].drop_duplicates()
         readings = readings.merge(botanists.data[[
             'botanist_email', 'botanist_id']], on='botanist_email', how='left').drop(columns='botanist_email')
         self.data = readings
