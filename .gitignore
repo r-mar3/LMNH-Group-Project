@@ -15,4 +15,4 @@ terraform.tfstate.backup
 
 data/
 
-*/__pycache__
+__pycache__/
