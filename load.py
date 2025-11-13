@@ -5,19 +5,22 @@ from os import environ
 from dotenv import load_dotenv
 import pandas as pd
 import pyodbc
+import numpy as np
 
-DATA_FILEPATH = './data/clean_data/'
-CSV_FILETYPE = '.csv'
-TABLE_NAMES = [
-    'license',
-    'species',
-    'image',
-    'botanist',
-    'plant',
+DATA_FILEPATH = './data/clean_data.csv'
+BASE_TABLES = [
     'country',
-    'reading',
+    'botanist',
+    'license'
+]
+
+FOREIGN_TABLES = [
+    'city',
     'origin',
-    'city'
+    'image',
+    'species',
+    'plant',
+    'reading'  # keep adding rows to this, allow duplicates!
 ]
 
 
@@ -36,12 +39,7 @@ def get_db_connection() -> pyodbc.Connection:
     return conn
 
 
-def load_csv(table_name: str) -> pd.DataFrame:
-    """Returns a dataframe of the csv for a given table name"""
-    return pd.read_csv(f'{DATA_FILEPATH}{table_name}{CSV_FILETYPE}')
-
-
-def upload_table_data(conn: pyodbc.Connection, table_name: str, df: pd.DataFrame) -> None:
+def upload_table_data(conn: pyodbc.Connection, table_name: str, df: pd.DataFrame, unique_col: str) -> None:
     """Uploads the data in the given dataframe to the matching table in the database"""
     columns = list(df.columns)
     column_names = ', '.join(columns)
@@ -49,17 +47,40 @@ def upload_table_data(conn: pyodbc.Connection, table_name: str, df: pd.DataFrame
     sql_query = f"""
         INSERT INTO
             {table_name} ({column_names})
-        VALUES
-            ({column_placeholders});
+        SELECT 
+            ({column_placeholders})
+        WHERE NOT EXISTS 
+            (SELECT 1 FROM {table_name} WHERE {unique_col} = ?)
+        ;
     """
+    df = df.dropna()
+
+    something_strange = []
+    for index, row in enumerate(df.to_numpy()):
+        something_strange.append(tuple(np.append(row, df[unique_col][index])))
 
     cur = conn.cursor()
-    cur.executemany(sql_query, [tuple(row) for row in df.to_numpy()])
+    cur.executemany(
+        sql_query, something_strange)
     cur.close()
 
 
 if __name__ == '__main__':
+    clean_table = pd.read_csv(DATA_FILEPATH)
+    tables = {}
+
+    # refactor to a function
+    columns = clean_table.columns.tolist()
+
+    for tablename in BASE_TABLES:
+        tables[tablename] = [col for col in columns if tablename + '_' in col]
+
+    for tablename in FOREIGN_TABLES:  # add a list of foreign col names for add 'foreign'+_id
+        tables[tablename] = [col for col in columns if tablename + '_' in col]
+
     with get_db_connection() as connection:
-        for table in TABLE_NAMES:
-            table_df = load_csv(table)
-            upload_table_data(connection, table, table_df)
+        # add base tables with auto generated ids
+        for table_name, columns in tables.items():
+            upload_table_data(connection, table_name,
+                              clean_table[columns], unique_col='country_name')
+            break
