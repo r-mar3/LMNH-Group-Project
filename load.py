@@ -146,6 +146,9 @@ def upload_table_data_with_foreign_key(conn: pyodbc.Connection, table_dict: dict
         df['reading_time_taken'] = pd.to_datetime(
             df['reading_time_taken'])
 
+    # params for executemany must be a tuple, and must include the
+    # values we want to insert, and the unique value to check against
+    # e.g. ('Albania', 'Albania') inserts Albania only if Albania doesn't exist
     sql_params = []
     for index, row in enumerate(df.to_numpy()):
         if table_dict['table_name'] == 'reading':
