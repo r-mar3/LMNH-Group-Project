@@ -6,6 +6,7 @@ import pandas as pd
 
 INPUT_PATH = './data/raw_data/plant_data_raw.json'
 OUTPUT_PATH = './data/'
+OUTPUT_FILE = f'{OUTPUT_PATH}clean_data.csv'
 
 
 def load_data() -> pd.DataFrame:
@@ -135,7 +136,7 @@ def transform() -> None:
     df = clean_data(df)
     df = format_errors(df)
     df = add_alerts(df)
-    df.to_csv(f'{OUTPUT_PATH}clean_data.csv', index=False)
+    df.to_csv(OUTPUT_FILE, index=False)
 
 
 def setup_output() -> None:
