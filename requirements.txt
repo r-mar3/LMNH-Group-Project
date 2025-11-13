@@ -1,1 +1,5 @@
 pyodbc
+dotenv
+requests
+pytest
+pylint
