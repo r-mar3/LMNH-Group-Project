@@ -90,10 +90,51 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def add_alerts(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    adding alerts column to dataframe based on if moisture
+    or temperature is beyond 1 standard deviation of the 
+    mean
+    """
+
+    temp_mean = data['reading_temperature'].mean()
+    temp_stdev = data['reading_temperature'].std()
+
+    moisture_mean = data['reading_soil_moisture'].mean()
+    moisture_stdev = data['reading_soil_moisture'].std()
+
+    data['reading_alert'] = (
+        (~data['reading_error']) & (
+            (data['reading_temperature'] > temp_mean+temp_stdev) |
+            (data['reading_temperature'] < temp_mean-temp_stdev) |
+            (data['reading_soil_moisture'] > moisture_mean+moisture_stdev) |
+            (data['reading_soil_moisture'] < moisture_mean-moisture_stdev)
+        )
+    )
+    return data
+
+
+def format_errors(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    formats the reading_error column so that it is True if there
+    is an error and False if not
+    """
+    for i in range(len(data['reading_temperature'])):
+
+        if pd.notna(data.loc[i, 'reading_error']):
+            data.loc[i, 'reading_error'] = True
+        else:
+            data.loc[i, 'reading_error'] = False
+
+    return data
+
+
 def transform() -> None:
     """Execute all transform processes"""
     df = load_data()
     df = clean_data(df)
+    df = format_errors(df)
+    df = add_alerts(df)
     df.to_csv(f'{OUTPUT_PATH}clean_data.csv', index=False)
 
 
