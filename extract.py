@@ -11,10 +11,9 @@ import time
 BASE_URL = 'http://sigma-labs-bot.herokuapp.com/api/plants/'
 OUTPUT_FOLDER = './data/raw_data/'
 OUTPUT_FILE = f'{OUTPUT_FOLDER}plant_data_raw.json'
-BASE_NUM_ENDPOINTS = 50
-MAX_ENDPOINT_PATH = './data/endpoint/'
-MAX_ENDPOINT_FILE = f'{MAX_ENDPOINT_PATH}endpoint.txt'
-NUM_PROCESSES = 32
+BASE_NUM_ENDPOINTS = 50  # The number of endpoints to fetch from by default
+NUM_PROCESSES_FETCH = 32  # The number of processes to use for reading the api
+NUM_PROCESSES_CHECK = 4  # The number of processes to use for checking new endpoints
 
 
 def set_up_logging() -> None:
@@ -52,32 +51,22 @@ def save_to_json(data: list[dict]) -> None:
 
 
 def check_new_endpoints() -> int:
-    """
-    Checks file storing the max endpoint
-    and updates it if more valid enpoints are found
-    """
-    if not os.path.exists(MAX_ENDPOINT_FILE):
-        if not os.path.exists(MAX_ENDPOINT_PATH):
-            os.makedirs(MAX_ENDPOINT_PATH)
-        with open(MAX_ENDPOINT_FILE, 'w', encoding='utf-8') as f:
-            f.write(str(BASE_NUM_ENDPOINTS))
+    """Checks for new endpoints and returns max endpoint to be read"""
+    current_max_endpoint = BASE_NUM_ENDPOINTS
 
-    with open(MAX_ENDPOINT_FILE, 'r+', encoding='utf-8') as f:
-        current_max_endpoint = int(f.read())
+    new_endpoints = True
 
-    with multiprocessing.Pool(NUM_PROCESSES) as pool:
-        data = pool.map(fetch_data_by_id, range(
-            current_max_endpoint, current_max_endpoint + 5))
+    while new_endpoints:
+        with multiprocessing.Pool(NUM_PROCESSES_CHECK) as pool:
+            data = pool.map(fetch_data_by_id, range(
+                current_max_endpoint, current_max_endpoint + 5))
 
-    for endpoint in data:
-        if endpoint.get('status_code') == 200:
-            current_max_endpoint += 5
+        for endpoint in data:
+            if endpoint.get('status_code') == 200:
+                current_max_endpoint += 5
+                break
 
-            with open(MAX_ENDPOINT_FILE, 'w', encoding='utf-8') as f:
-                f.write(str(current_max_endpoint))
-
-            current_max_endpoint = check_new_endpoints()
-            break
+            new_endpoints = False
 
     return current_max_endpoint
 
@@ -86,7 +75,7 @@ def extract_data() -> None:
     """Runs the extract functions for all ids and catches error"""
     data = []
     max_endpoint = check_new_endpoints()
-    with multiprocessing.Pool(NUM_PROCESSES) as pool:
+    with multiprocessing.Pool(NUM_PROCESSES_FETCH) as pool:
         data = pool.map(fetch_data_by_id, range(1, max_endpoint + 1))
 
     successful_data = [
@@ -100,4 +89,5 @@ if __name__ == "__main__":
     set_up_logging()
     extract_data()
     end_time = time.time()
-    print(f'Time taken = {end_time - start_time}')
+    time_taken = end_time - start_time
+    logging.info('Time taken = %s', time_taken)
