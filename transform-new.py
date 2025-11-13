@@ -86,6 +86,7 @@ class TransformManager:
         readings = ReadingTable(df, botanists)
 
         for table in [countries, cities, licenses, images, botanists, species, origins, plants, readings]:
+            table.clean_data()
             table.save_to_file()
 
 
@@ -104,6 +105,9 @@ class BaseTable:
     def assign_ids(self, id_name: str) -> None:
         """Assign unique ids for each row in the data"""
         self.data.insert(0, id_name, range(1, len(self.data) + 1))
+
+    def clean_data(self) -> None:
+        pass
 
 
 class CountryTable(BaseTable):
