@@ -1,7 +1,7 @@
 """Tests extract script edge cases, ideal and unideal behaviour"""
 import json
 import pytest
-from extract import save_to_json, check_new_endpoints, extract_data, BASE_NUM_ENDPOINTS
+from etl.extract import save_to_json, check_new_endpoints, extract_data, BASE_NUM_ENDPOINTS
 
 
 def test_save_to_json_contents_correct(monkeypatch, tmp_path):
