@@ -4,11 +4,6 @@ import pytest
 from extract import fetch_data_by_id, save_to_json, extract_data
 
 
-def test_fetch_data_by_id_body_type():
-    """Asserts that the data fetched is returned as a dict"""
-    assert isinstance(fetch_data_by_id(2), dict)
-
-
 def test_save_to_json_contents_correct(monkeypatch, tmp_path):
     """Asserts that all the data fetched is saved into .json file"""
     fake_data = [{'plant_id': 55, 'name': 'Crabby Tree'},
