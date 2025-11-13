@@ -60,4 +60,5 @@ if __name__ == '__main__':
 
         # add base tables with auto generated ids
         for table in BASE_TABLES:
+
             upload_table_data(connection, table, clean_table)
