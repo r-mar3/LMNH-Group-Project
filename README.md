@@ -5,7 +5,7 @@ This project was built for the Liverpool Natural History Museum (LMNH) to aid th
 found in their botanical wing. The LMNH has gardeners who are responsible for monitoring the plant health, but due to the number of plants with varying
 condition needs, monitoring can be very challenging. 
 
-In order to combat the challenges they are facing, we have built an automated pipeline which extracts data on various environmental factors about each plant (inc. NAME THE FACTORS) from XYZ.
+In order to combat the challenges they are facing, we have built an automated pipeline which extracts data on various environmental factors about each plant, such as soil moisture from each plant via their pre-existing API.
 
 
 # How the project works:
