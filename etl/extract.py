@@ -9,7 +9,7 @@ import requests as req
 import time
 
 BASE_URL = 'http://sigma-labs-bot.herokuapp.com/api/plants/'
-OUTPUT_FOLDER = './data/raw_data/'
+OUTPUT_FOLDER = '.tmp/data/raw_data/'
 OUTPUT_FILE = f'{OUTPUT_FOLDER}plant_data_raw.json'
 BASE_NUM_ENDPOINTS = 50  # The number of endpoints to fetch from by default
 NUM_PROCESSES_FETCH = 32  # The number of processes to use for reading the api

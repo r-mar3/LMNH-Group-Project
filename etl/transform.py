@@ -4,8 +4,8 @@ import json
 import os
 import pandas as pd
 
-INPUT_PATH = './data/raw_data/plant_data_raw.json'
-OUTPUT_PATH = './data/'
+INPUT_PATH = '.tmp/data/raw_data/plant_data_raw.json'
+OUTPUT_PATH = '.tmp/data/'
 OUTPUT_FILE = f'{OUTPUT_PATH}clean_data.csv'
 
 
@@ -130,8 +130,15 @@ def format_errors(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def transform() -> None:
+def setup_output() -> None:
+    """Setup output folder for clean data"""
+    if not os.path.exists(OUTPUT_PATH):
+        os.makedirs(OUTPUT_PATH)
+
+
+def transform_data() -> None:
     """Execute all transform processes"""
+    setup_output()
     df = load_data()
     df = clean_data(df)
     df = format_errors(df)
@@ -139,12 +146,5 @@ def transform() -> None:
     df.to_csv(OUTPUT_FILE, index=False)
 
 
-def setup_output() -> None:
-    """Setup output folder for clean data"""
-    if not os.path.exists(OUTPUT_PATH):
-        os.makedirs(OUTPUT_PATH)
-
-
 if __name__ == "__main__":
-    setup_output()
-    transform()
+    transform_data()
