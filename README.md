@@ -1,8 +1,7 @@
 # LMNH-Group-Project 
-> TO BE COMPLETED
 
 # Project Description:
-> What is this project for? What is the purpose here?
+> Purpose of the project
 
 # How the project works:
 > How does this project work? What does the code DO?
