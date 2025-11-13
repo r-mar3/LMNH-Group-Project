@@ -14,6 +14,7 @@ OUTPUT_FILE = f'{OUTPUT_FOLDER}plant_data_raw.json'
 BASE_NUM_ENDPOINTS = 50  # The number of endpoints to fetch from by default
 NUM_PROCESSES_FETCH = 32  # The number of processes to use for reading the api
 NUM_PROCESSES_CHECK = 4  # The number of processes to use for checking new endpoints
+REQUEST_TIMEOUT = 5  # Time in seconds for each request timeout
 
 
 def set_up_logging() -> None:
@@ -33,7 +34,7 @@ def set_up_logging() -> None:
 
 def fetch_data_by_id(plant_id: int) -> dict:
     """Returns a dict with status code and response data"""
-    response = req.get(f"{BASE_URL}{plant_id}", timeout=5)
+    response = req.get(f"{BASE_URL}{plant_id}", timeout=REQUEST_TIMEOUT)
 
     status_code = response.status_code
     body = response.json()
