@@ -9,7 +9,7 @@ import numpy as np
 from datetime import datetime
 from pprint import pprint
 
-DATA_FILEPATH = './data/clean_data.csv'
+DATA_FILEPATH = '../data/clean_data.csv'
 
 TABLES = [
     {

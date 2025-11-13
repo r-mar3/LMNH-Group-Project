@@ -13,3 +13,7 @@ def run_pipeline():
 
 def lambda_handler(event, context):
     run_pipeline()
+
+
+if __name__ == "__main__":
+    lambda_handler({}, {})
