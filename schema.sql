@@ -61,7 +61,7 @@ CREATE TABLE species (
 );
 
 CREATE TABLE plant (
-    plant_id INT IDENTITY (1,1),
+    plant_id INT UNIQUE,
     origin_id INT,
     species_id INT,
     PRIMARY KEY (plant_id),

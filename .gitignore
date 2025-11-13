@@ -1,5 +1,5 @@
 .terraform
-
+data
 .venv
 
 .env
@@ -14,4 +14,3 @@ terraform.tfstate.backup
 .terraform.lock.hcl
 
 data/
-

@@ -1,24 +1,7 @@
 """Tests extract script edge cases, ideal and unideal behaviour"""
 import json
 import pytest
-from extract import fetch_data_by_id, save_to_json, extract_data, SEARCH_RANGE_MAX
-
-
-def test_fetch_data_by_id_body_type():
-    """Asserts that the data fetched is returned as a dict"""
-    assert isinstance(fetch_data_by_id(2), dict)
-
-
-def test_fetch_data_by_id_failure_1():
-    """Asserts that a ValueError is raised if id is out of range"""
-    with pytest.raises(ValueError):
-        fetch_data_by_id(SEARCH_RANGE_MAX)
-
-
-def test_fetch_data_by_id_failure_2():
-    """Asserts that a ValueError is raised if id is out of range"""
-    with pytest.raises(ValueError):
-        fetch_data_by_id(0)
+from extract import save_to_json, check_new_endpoints, extract_data, BASE_NUM_ENDPOINTS
 
 
 def test_save_to_json_contents_correct(monkeypatch, tmp_path):
@@ -53,14 +36,58 @@ def test_save_to_json_empty(monkeypatch, tmp_path):
     assert fake_output_data == []
 
 
-def monkeypatch_fetch_data_by_id(id_num):
+def monkeypatch_fetch_data_by_id_1(id_num):
+    """Fake fetch data function to ensure the new endpoint is only one increment
+    above the current known endpoint"""
+    if id_num == BASE_NUM_ENDPOINTS:
+        return {"status_code": 200, "body": {"id": id_num}}
+    return {"status_code": 404, "body": {}}
+
+
+def test_check_new_endpoints_new_found(monkeypatch):
+    """Asserts that if a new endpoint is found, the current_max_endpoint goes up
+    by 5 during the search"""
+    monkeypatch.setattr('extract.fetch_data_by_id',
+                        monkeypatch_fetch_data_by_id_1)
+    result = check_new_endpoints()
+    assert result == BASE_NUM_ENDPOINTS + 5
+
+
+def monkeypatch_fetch_data_by_id_2(id_num):
+    """Fake fetch data function to ensure the new endpoint is only one increment
+    above the current known endpoint"""
+    return {"status_code": 404, "body": {}}
+
+
+def test_check_new_endpoints_no_new_found(monkeypatch):
+    """Asserts that if no new endpoint is found, the endpoint is equal to the
+    base_num_endpoints value"""
+    monkeypatch.setattr("extract.fetch_data_by_id",
+                        monkeypatch_fetch_data_by_id_2)
+    result = check_new_endpoints()
+    assert result == BASE_NUM_ENDPOINTS
+
+
+class FakePool:
+    """Fake 'Pool' class to replace multiprocessing.Pool for tests"""
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def map(self, func, iterable):
+        return [func(i) for i in iterable]
+
+
+def monkeypatch_fetch_data_by_id_3(id_num):
     """Fake fetch data function"""
-    return {
-        "status_code": 200,
-        "body": {'plant_id': id_num,
-                 'name': f'Test plant {id_num}',
-                 }
-    }
+    return {'status_code': 200,
+            'body': {'plant_id': id_num, 'name': f'Test plant {id_num}'}}
 
 
 def test_extract_data(monkeypatch, tmp_path):
@@ -69,9 +96,12 @@ def test_extract_data(monkeypatch, tmp_path):
     is working as expected"""
     fake_output = tmp_path/'plant_data_raw_test.json'
     monkeypatch.setattr('extract.OUTPUT_FILE', str(fake_output))
-    monkeypatch.setattr('extract.SEARCH_RANGE_MAX', 4)
+    monkeypatch.setattr('extract.BASE_NUM_ENDPOINTS', 3)
+    monkeypatch.setattr('extract.multiprocessing.Pool',
+                        lambda *a, **k: FakePool())
+    monkeypatch.setattr('extract.check_new_endpoints', lambda: 3)
     monkeypatch.setattr('extract.fetch_data_by_id',
-                        monkeypatch_fetch_data_by_id)
+                        monkeypatch_fetch_data_by_id_3)
 
     extract_data()
 
@@ -81,8 +111,8 @@ def test_extract_data(monkeypatch, tmp_path):
     ids = []
     names = []
     for datapoint in fake_output_data:
-        ids.append(datapoint['body']['plant_id'])
-        names.append(datapoint['body']['name'])
+        ids.append(datapoint['plant_id'])
+        names.append(datapoint['name'])
 
     assert len(fake_output_data) == 3
     assert ids == [1, 2, 3]
@@ -92,13 +122,8 @@ def test_extract_data(monkeypatch, tmp_path):
 def monkeypatch_fetch_data_by_id_some_errors(id_num):
     """Fake fetch function that raises error for plants with even id number"""
     if id_num % 2 == 0:
-        raise ValueError
-    return {
-        "status_code": 200,
-        "body": {'plant_id': id_num,
-                 'name': f'Test plant {id_num}',
-                 }
-    }
+        return {'status_code': 404, 'body': {}}
+    return {'status_code': 200, 'body': {'plant_id': id_num, 'name': f'Test plant {id_num}'}}
 
 
 def test_extract_data_some_errors(monkeypatch, tmp_path):
@@ -107,7 +132,10 @@ def test_extract_data_some_errors(monkeypatch, tmp_path):
     is working as expected albeit the mixed success at fetching data"""
     fake_output = tmp_path/'plant_data_raw_test.json'
     monkeypatch.setattr('extract.OUTPUT_FILE', str(fake_output))
-    monkeypatch.setattr('extract.SEARCH_RANGE_MAX', 9)
+    monkeypatch.setattr('extract.BASE_NUM_ENDPOINTS', 7)
+    monkeypatch.setattr('extract.multiprocessing.Pool',
+                        lambda *a, **k: FakePool())
+    monkeypatch.setattr('extract.check_new_endpoints', lambda: 7)
     monkeypatch.setattr('extract.fetch_data_by_id',
                         monkeypatch_fetch_data_by_id_some_errors)
 
@@ -116,13 +144,13 @@ def test_extract_data_some_errors(monkeypatch, tmp_path):
     with open(fake_output, 'r', encoding='utf-8') as f:
         fake_output_data = json.load(f)
 
-    ids = []
-    names = []
-    for datapoint in fake_output_data:
-        ids.append(datapoint['body']['plant_id'])
-        names.append(datapoint['body']['name'])
+        ids = []
+        names = []
+        for datapoint in fake_output_data:
+            ids.append(datapoint['plant_id'])
+            names.append(datapoint['name'])
 
-    assert len(fake_output_data) == 4
-    assert ids == [1, 3, 5, 7]
-    assert names == ['Test plant 1', 'Test plant 3',
-                     'Test plant 5', 'Test plant 7']
+        assert len(fake_output_data) == 4
+        assert ids == [1, 3, 5, 7]
+        assert names == ['Test plant 1', 'Test plant 3',
+                         'Test plant 5', 'Test plant 7']
