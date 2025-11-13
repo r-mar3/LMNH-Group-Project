@@ -86,25 +86,24 @@ class FakePool:
 
 def monkeypatch_fetch_data_by_id_3(id_num):
     """Fake fetch data function"""
-    return {"status_code": 200,
-            "body": {'plant_id': id_num, 'name': f'Test plant {id_num}'}}
+    return {'status_code': 200,
+            'body': {'plant_id': id_num, 'name': f'Test plant {id_num}'}}
 
 
 def test_extract_data(monkeypatch, tmp_path):
     """Tests the full functionality of the extract file if all plant data
     is successfully fetched and saved to .json file, and asserts that everything
     is working as expected"""
-    import extract
     fake_output = tmp_path/'plant_data_raw_test.json'
     monkeypatch.setattr('extract.OUTPUT_FILE', str(fake_output))
     monkeypatch.setattr('extract.BASE_NUM_ENDPOINTS', 3)
-    monkeypatch.setattr(extract.multiprocessing, "Pool",
+    monkeypatch.setattr('extract.multiprocessing.Pool',
                         lambda *a, **k: FakePool())
-    monkeypatch.setattr(extract, 'check_new_endpoints', lambda: 3)
-    monkeypatch.setattr(extract, "fetch_data_by_id",
+    monkeypatch.setattr('extract.check_new_endpoints', lambda: 3)
+    monkeypatch.setattr('extract.fetch_data_by_id',
                         monkeypatch_fetch_data_by_id_3)
 
-    extract.extract_data()
+    extract_data()
 
     with open(fake_output, 'r', encoding='utf-8') as f:
         fake_output_data = json.load(f)
@@ -123,24 +122,24 @@ def test_extract_data(monkeypatch, tmp_path):
 def monkeypatch_fetch_data_by_id_some_errors(id_num):
     """Fake fetch function that raises error for plants with even id number"""
     if id_num % 2 == 0:
-        return {"status_code": 404, "body": {}}
-    return {"status_code": 200, "body": {"plant_id": id_num, "name": f"Test plant {id_num}"}}
+        return {'status_code': 404, 'body': {}}
+    return {'status_code': 200, 'body': {'plant_id': id_num, 'name': f'Test plant {id_num}'}}
 
 
 def test_extract_data_some_errors(monkeypatch, tmp_path):
     """Tests the full functionality of the extract file if only some plant data
     is successfully fetched and saved to .json file, and asserts that everything
     is working as expected albeit the mixed success at fetching data"""
-    import extract
     fake_output = tmp_path/'plant_data_raw_test.json'
     monkeypatch.setattr('extract.OUTPUT_FILE', str(fake_output))
     monkeypatch.setattr('extract.BASE_NUM_ENDPOINTS', 7)
-    monkeypatch.setattr(extract.multiprocessing, "Pool",
+    monkeypatch.setattr('extract.multiprocessing.Pool',
                         lambda *a, **k: FakePool())
-    monkeypatch.setattr(extract, 'check_new_endpoints', lambda: 7)
-    extract.fetch_data_by_id = monkeypatch_fetch_data_by_id_some_errors
+    monkeypatch.setattr('extract.check_new_endpoints', lambda: 7)
+    monkeypatch.setattr('extract.fetch_data_by_id',
+                        monkeypatch_fetch_data_by_id_some_errors)
 
-    extract.extract_data()
+    extract_data()
 
     with open(fake_output, 'r', encoding='utf-8') as f:
         fake_output_data = json.load(f)
