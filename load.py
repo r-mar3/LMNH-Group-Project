@@ -37,7 +37,7 @@ FOREIGN_TABLES = [
     {
         'table_name': 'origin',
         'columns': ['origin_longitude', 'origin_latitude', 'city_id'],
-        'unique_column': ['origin_longitude', 'origin_latitude']
+        'unique_column': 'origin_longitude'
     },
     {
         'table_name': 'image',
@@ -57,7 +57,7 @@ FOREIGN_TABLES = [
     {
         'table_name': 'reading',
         'columns': ['reading_last_watered', 'reading_time_taken', 'reading_soil_moisture', 'reading_temperature', 'reading_error', 'botanist_id', 'plant_id'],
-        'unique_column': ''
+        'unique_column': ['']
     }
 
 ]
@@ -83,11 +83,13 @@ def upload_table_data_with_foreign_key(conn: pyodbc.Connection, table_dict: dict
     columns = table_dict['columns']
     column_names = ', '.join(columns)
     # column names which only appear in this table
-    local = [col for col in columns if not col.endswith('_id')]
+    local = [col for col in columns if not col.endswith(
+        '_id') or col == 'plant_id']
     # local_names = ', '.join(local)
     # foreign table names which are mentioned
-    all_foreign_keys = [col for col in columns if col.endswith('_id')]
-    all_foreign_names = [col.replace('_id', '') for col in all_foreign_keys]
+    all_foreign_keys = [
+        col for col in columns if col.endswith('_id') and col != 'plant_id']
+    # all_foreign_names = [col.replace('_id', '') for col in all_foreign_keys]
 
     column_placeholders = ', '.join('?' for _ in local)
     table_name = table_dict['table_name']
@@ -119,25 +121,22 @@ def upload_table_data_with_foreign_key(conn: pyodbc.Connection, table_dict: dict
             FROM
                 {foreign_table['table_name']}
             WHERE
-                {foreign_table['unique_column']} = ?)
-
-            """
-
-    df = df[all_foreign_unique_columns]
+                {foreign_table['unique_column']} = ?),"""
+    sql_query = sql_query[:-1]
 
     sql_query += f"""
         WHERE NOT EXISTS
-            (SELECT 1 FROM {table_name} WHERE {unique_col}= ?)
-        ;
-    """
+            (SELECT 1 FROM {table_name} WHERE {unique_col} = ?);"""
+
+    print(sql_query)
+    input()
+
+    df = df[all_foreign_unique_columns]
+    df = df.dropna().reset_index()
 
     sql_params = []
     for index, row in enumerate(df.to_numpy()):
-        something = np.append(row, df[unique_col][index])
-        sql_params.append(tuple(np.append(something, ',')))
-
-    print(sql_params)
-    input()
+        sql_params.append(tuple(np.append(row[1:], df[unique_col][index])))
 
     cur = conn.cursor()
     cur.executemany(sql_query, sql_params)
