@@ -40,9 +40,9 @@ resource "aws_s3_bucket_versioning" "radas-plants-s3-version" {
   }
 }
 
-#create ECR to store docker image
-resource "aws_ecr_repository" "radas-plants-ecr" {
-  name = "radas-plants-ecr"
+#create ECR to store etl docker image
+resource "aws_ecr_repository" "radas-plants-etl-ecr" {
+  name = "radas-plants-etl-ecr"
   image_tag_mutability = "MUTABLE"
   image_scanning_configuration {
     scan_on_push = true
@@ -54,10 +54,48 @@ resource "aws_ecr_repository" "radas-plants-ecr" {
   }
 }
 
-# #outputs the ECR url
-# output "repository_url" {
-#   value = aws_ecr_repository.radas-plants-ecr.repository_url
-# }
+#create ECR to store summary docker image
+resource "aws_ecr_repository" "radas-plants-summary-ecr" {
+  name = "radas-plants-summary-ecr"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Environment = "dev"
+    Project = "radas-plants"
+  }
+}
+
+#create ECR to store dashboard docker image
+resource "aws_ecr_repository" "radas-plants-dashboard-ecr" {
+  name = "radas-plants-dashboard-ecr"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Environment = "dev"
+    Project = "radas-plants"
+  }
+}
+
+#create ECR to store notifications docker image
+resource "aws_ecr_repository" "radas-plants-notifications-ecr" {
+  name = "radas-plants-notifications-ecr"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  tags = {
+    Environment = "dev"
+    Project = "radas-plants"
+  }
+}
+
 
 #creates the ECS cluster for running tasks on
 resource "aws_ecs_cluster" "radas-plants-ecs" {
@@ -80,7 +118,7 @@ data "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 }
 
-#Creating the task definition family for the ECS
+#Creating the task definition family for the ETL
 resource "aws_ecs_task_definition" "radas-plants-pipeline" {
   family = "radas-plants-pipeline-family"
   network_mode = "awsvpc"
@@ -90,6 +128,37 @@ container_definitions = jsonencode([
     {
       name      = "ronn-pipeline-task"
       image     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/radas-plants-etl:latest"
+      essential = true
+      environment = [ 
+        {name = "DB_HOST", value = var.DB_HOST},
+        {name = "DB_PORT", value = var.DB_PORT},
+        {name = "DB_NAME", value = var.DB_NAME},
+        {name = "DB_USER", value = var.DB_USERNAME},
+        {name = "DB_PASSWORD", value = var.DB_PASSWORD},
+        {name = "ACCESS_KEY", value = var.AWS_ACCESS_KEY_ID},
+        {name = "SECRET_ACCESS_KEY", value = var.AWS_SECRET_ACCESS_KEY},
+        {name = "REGION", value = var.AWS_DEFAULT_REGION},
+        {name = "BUCKET_NAME", value = var.BUCKET_NAME}
+      ]
+    }
+  ])
+
+  cpu = 512
+  memory = 1024
+  task_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
+}
+
+#Creating the task definition family for the summary
+resource "aws_ecs_task_definition" "radas-plants-summary" {
+  family = "radas-plants-summary-family"
+  network_mode = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+
+container_definitions = jsonencode([
+    {
+      name      = "radas-summary-task"
+      image     = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/radas-plants-summary-ecr:latest"
       essential = true
       environment = [ 
         {name = "DB_HOST", value = var.DB_HOST},
@@ -125,6 +194,7 @@ resource "aws_ecs_service" "radas-plants-ecs-service" {
   }
 }
 
+
 #creating iam role for the lambda that runs ETL container
 resource "aws_iam_role" "radas-etl-lambda-iam-role" {
   name = "radas-etl-lambda-iam-role"
@@ -146,6 +216,11 @@ resource "aws_iam_role" "radas-etl-lambda-iam-role" {
 resource "aws_iam_role_policy_attachment" "radas-lambda-etl-policy-attachment" {
   role = aws_iam_role.radas-etl-lambda-iam-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "radas-lambda-etl-allow-ecr-access" {
+  role = aws_iam_role.radas-etl-lambda-iam-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 #adding policies to ETL Lambda's IAM role to allow access to RDS
@@ -180,29 +255,11 @@ resource "aws_lambda_function" "radas-lambda-etl-pipeline" {
   function_name = "radas-lambda-etl-pipeline"
   role = aws_iam_role.radas-etl-lambda-iam-role.arn
   package_type = "Image"
-  image_uri = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/radas-plants-ecr:latest"
+  image_uri = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/radas-plants-etl-ecr:latest"
 
   architectures = ["x86_64"]
+  
 
-}
-
-#ECR for the plants summary data
-resource "aws_ecr_repository" "radas-plants-summary-ecr" {
-  name = "radas-plants-summary-ecr"
-  image_tag_mutability = "MUTABLE"
-  image_scanning_configuration {
-    scan_on_push = true
-  }
-
-  tags = {
-    Environment = "dev"
-    Project = "radas-plants"
-  }
-}
-
-#outputs the ECR url
-output "repository_url" {
-  value = aws_ecr_repository.radas-plants-summary-ecr.repository_url
 }
 
 #IAM role for the summary data Lambda
@@ -226,6 +283,11 @@ resource "aws_iam_role" "radas-summary-lambda-iam-role" {
 resource "aws_iam_role_policy_attachment" "radas-lambda-summary-policy-attachment" {
   role = aws_iam_role.radas-summary-lambda-iam-role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "radas-lambda-summary-allow-ecr-access" {
+  role = aws_iam_role.radas-summary-lambda-iam-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 #attaching permissions to read and write to S3
@@ -261,3 +323,82 @@ resource "aws_lambda_function" "radas-lambda-summary" {
   architectures = ["x86_64"]
 
 }
+
+
+#creating iam role for the lambda that runs dashboard container
+resource "aws_iam_role" "radas-dashboard-iam-role" {
+  name = "radas-dashboard-iam-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+#attaching execution role to ETL Lambda's IAM role
+resource "aws_iam_role_policy_attachment" "radas-lambda-dashboard-policy-attachment" {
+  role = aws_iam_role.radas-dashboard-iam-role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "radas-lambda-dashboard-allow-ecr-access" {
+  role = aws_iam_role.radas-dashboard-iam-role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+#creating lambda function for running the summary data container
+resource "aws_lambda_function" "radas-lambda-dashboard" {
+  function_name = "radas-lambda-dashboard"
+  role = aws_iam_role.radas-dashboard-iam-role.arn
+  package_type = "Image"
+  image_uri = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/radas-plants-dashboard-ecr:latest"
+
+  architectures = ["x86_64"]
+
+}
+
+#policy document for the scheduler
+data "aws_iam_policy_document" "radas-etl-scheduler-policy-doc" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type = "Service"
+      identifiers = ["scheduler.amazonaws.com"]
+    }
+  }
+}
+
+#iam role for the scheduler
+resource "aws_iam_role" "radas-etl-scheduler-role" {
+  name = "radas-etl-scheduler-role"
+  assume_role_policy = data.aws_iam_policy_document.radas-etl-scheduler-policy-doc.json
+}
+
+#allowing scheduler to invoke lambda
+resource "aws_iam_policy" "radas-etl-scheduler-policy" {
+  name = "radas-etl-scheduler-policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "lambda:InvokeFunction",
+          "lambda:InvokeAsync"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+
+
+

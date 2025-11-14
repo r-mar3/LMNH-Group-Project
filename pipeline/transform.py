@@ -9,14 +9,6 @@ OUTPUT_PATH = './data/'
 OUTPUT_FILE = f'{OUTPUT_PATH}clean_data.csv'
 
 
-def load_data() -> pd.DataFrame:
-    """Returns a flatted (denormalised) dataframe of all data in the raw data csv"""
-    with open(INPUT_PATH, 'r', encoding='utf-8') as f:
-        raw_data = json.load(f)
-
-    return pd.DataFrame(flatten_data(raw_data))
-
-
 def get_nested(dictionary: dict, *keys: tuple):
     """Used to get data from a nested dict. Will return None if any level isn't valid"""
 
@@ -67,6 +59,14 @@ def flatten_data(raw_data: list[dict]) -> list[dict]:
     return rows
 
 
+def load_data() -> pd.DataFrame:
+    """Returns a flatted (denormalised) dataframe of all data in the raw data csv"""
+    with open(INPUT_PATH, 'r', encoding='utf-8') as f:
+        raw_data = json.load(f)
+
+    return pd.DataFrame(flatten_data(raw_data))
+
+
 def clean_phone(df: pd.DataFrame) -> pd.DataFrame:
     """Converts all phone numbers to symbol-less format, keeping extension codes"""
     df['botanist_phone'] = df['botanist_phone'].str.replace(
@@ -91,6 +91,21 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def format_errors(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    formats the reading_error column so that it is True if there
+    is an error and False if not
+    """
+    for i in range(len(data['reading_temperature'])):
+
+        if pd.notna(data.loc[i, 'reading_error']):
+            data.loc[i, 'reading_error'] = True
+        else:
+            data.loc[i, 'reading_error'] = False
+
+    return data
+
+
 def add_alerts(data: pd.DataFrame) -> pd.DataFrame:
     """
     adding alerts column to dataframe based on if moisture
@@ -112,21 +127,6 @@ def add_alerts(data: pd.DataFrame) -> pd.DataFrame:
             (data['reading_soil_moisture'] < moisture_mean-moisture_stdev)
         )
     )
-    return data
-
-
-def format_errors(data: pd.DataFrame) -> pd.DataFrame:
-    """
-    formats the reading_error column so that it is True if there
-    is an error and False if not
-    """
-    for i in range(len(data['reading_temperature'])):
-
-        if pd.notna(data.loc[i, 'reading_error']):
-            data.loc[i, 'reading_error'] = True
-        else:
-            data.loc[i, 'reading_error'] = False
-
     return data
 
 
