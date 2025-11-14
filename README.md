@@ -19,7 +19,12 @@ Both short-term storage (including plant health data for the past 24 hours) and 
 Data visualisation is also included, with the Streamlit dashboard providing a clear and easily disgestable way to visualise real-time plant health data on latest temperature and moisture readings for each plant, as well as the ption to view historical plant health data.
 
 # How to run the code:
-> Instructions on how to run the code (include examples?)
+
+> For general use:
+You can visit the dashboard at: [LINK TO DASHBOARD]
+
+> To built from scratch:
+Please contact an admin at: guavacat23@gmail.com
 
 # Entity-Relationship Diagram (ERD):
 The diagram below shows our database design, including entity relationships between each table in our database, normalised to 3NF.
