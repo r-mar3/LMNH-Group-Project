@@ -47,6 +47,32 @@ The wireframe below displays the layout and structure plan for the data visualis
 <img width="442" height="643" alt="plants_wireframe" src="https://github.com/user-attachments/assets/07b6560f-93eb-4112-8784-557616821ed9" />
 
 
+# User Stories
+
+## Hi, I'm a Gardener.
+
+- I want to be alerted if the temperature or soil moisture is a concerning value (far outside average for a specific plant).
+- Why? Because I don't want my plants to die.
+
+## Hi, I'm a Technician who helped setup the raspberry pi sensors.
+
+- I want to make sure the sensors are working by visualising the live data they capture every minute using the recording taken time.
+- Why? Because I want my efforts building this API and sensor connection to not be in vain.
+
+- I also want a visual of the errors that the raspberry pi transmits using a live graph showing errors over time
+- Why? Because I want my efforts building this API and sensor connection to not be in vain.
+
+- I want to know if a sensor is running into continous errors with a single alert me based on repeated True values in a time constraint in the error column.
+- Why? Because I want my efforts building this API and sensor connection to not be in vain.
+
+## Hi, I'm Financially invested in the museum.
+
+- I want to procure more plants that are not overly fragile, so I want to track the number of alerts for each plant.
+- Why? This would help me know what plants/species to look out for when planning our plant expansion.
+  
+- I want to know which botanists are recoding the most readings.
+- Why? To ensure one botanist is not doing all the readings, and also to rewards the botanists going out of their way to work more.
+
 ## Credits:
 - Adam Cummings: Engineer & Analyst, Architect & DevOps
 - Sami Lachqar: Engineer & Analyst, Architect & DevOps
