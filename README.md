@@ -20,10 +20,10 @@ Data visualisation is also included, with the Streamlit dashboard providing a cl
 
 # How to run the code:
 
-> For general use:
+For general use:
 You can visit the dashboard at: [LINK TO DASHBOARD]
 
-> To built from scratch:
+To built from scratch:
 Ensure you have Docker and Terraform installed
 
 Docker: https://docs.docker.com/engine/install/
