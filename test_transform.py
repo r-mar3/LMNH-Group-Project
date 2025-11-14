@@ -2,8 +2,8 @@
 import json
 import pytest
 import pandas as pd
-from transform import get_nested, flatten_data, load_data, clean_phone
-from transform import clean_data, add_alerts, format_errors, setup_output
+from pipeline.transform import get_nested, flatten_data, load_data, clean_phone
+from pipeline.transform import clean_data, add_alerts, format_errors, setup_output
 
 
 def test_get_nested_is_dict():
@@ -107,7 +107,7 @@ def test_flatten_data_missing_values_2(fake_data):
 def test_load_data(monkeypatch, tmp_path, fake_data):
     """Assert that load_data returns a pandas DataFrame as expected"""
     tmp_file = tmp_path / "fake_data.json"
-    monkeypatch.setattr("transform.INPUT_PATH", tmp_file)
+    monkeypatch.setattr("pipeline.transform.INPUT_PATH", tmp_file)
 
     with open(tmp_file, "w+", encoding="utf-8") as f:
         json.dump(fake_data, f)
@@ -120,7 +120,7 @@ def test_load_data_row_count(monkeypatch, tmp_path, fake_data):
     """Assert that the dataframe has the same number of rows as the data
     and nothing is being dropped"""
     tmp_file = tmp_path / "fake_data.json"
-    monkeypatch.setattr("transform.INPUT_PATH", tmp_file)
+    monkeypatch.setattr("pipeline.transform.INPUT_PATH", tmp_file)
 
     with open(tmp_file, "w+", encoding="utf-8") as f:
         json.dump(fake_data, f)
@@ -134,7 +134,7 @@ def test_load_data_all_columns_exist(monkeypatch, tmp_path, fake_data):
     the pandas DataFrame"""
 
     tmp_file = tmp_path / "fake_data.json"
-    monkeypatch.setattr("transform.INPUT_PATH", tmp_file)
+    monkeypatch.setattr("pipeline.transform.INPUT_PATH", tmp_file)
 
     with open(tmp_file, "w+", encoding="utf-8") as f:
         json.dump(fake_data, f)
@@ -226,7 +226,7 @@ def test_add_alerts_expected_results():
 def setup_output_creates_dir(monkeypatch, tmp_path):
     """Asserts that if the output folder doesn't exist, it is created"""
     test_output_dir = tmp_path / "test_output"
-    monkeypatch.setattr("transform.OUTPUT_PATH", str(test_output_dir))
+    monkeypatch.setattr("pipeline.transform.OUTPUT_PATH", str(test_output_dir))
 
     assert not test_output_dir.exists()
 
