@@ -3,6 +3,8 @@ FROM python:3.13-slim-bullseye
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
+# This run command installs msodbcsql18, unixodbc and their required dependencies so that the pyodbc python library will function correctly.
+# This involves making sure gcc is installed and up to date, as well as verifying with a microsoft key and accepting the EULA
 RUN apt-get update && \
     apt-get install -y curl gnupg gcc g++ unixodbc-dev && \
     curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
@@ -13,4 +15,4 @@ RUN apt-get update && \
 
 COPY create_summaries.py .
 
-CMD python3 create_summaries.py
+CMD ["python3", "create_summaries.py"]
