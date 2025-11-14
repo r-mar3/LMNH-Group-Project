@@ -1,7 +1,7 @@
 """Tests load script to ensure script is working as expected"""
+from unittest.mock import MagicMock
 import pytest
 import pandas as pd
-from unittest.mock import MagicMock
 from load import upload_table_data_with_foreign_key, upload_table_data
 
 
