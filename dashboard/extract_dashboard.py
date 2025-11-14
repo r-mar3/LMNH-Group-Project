@@ -1,3 +1,4 @@
+"""Extracts all data from the RDS to be displayed on the dashboard"""
 import pyodbc
 from dotenv import load_dotenv
 from os import environ
