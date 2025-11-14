@@ -32,7 +32,7 @@ The diagram below provides a visual representation of the AWS cloud system where
 ![alt text](image.png)
 
 # Dashboard Wireframe:
-The wireframe below displays the layout and structure plan for the data visualisation dashboard to be run on Streamlit
+The wireframe below displays the layout and structure plan for the data visualisation dashboard to be run on Streamlit.
 
 <img width="442" height="643" alt="plants_wireframe" src="https://github.com/user-attachments/assets/07b6560f-93eb-4112-8784-557616821ed9" />
 
