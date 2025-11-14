@@ -24,6 +24,11 @@ Data visualisation is also included, with the Streamlit dashboard providing a cl
 You can visit the dashboard at: [LINK TO DASHBOARD]
 
 > To built from scratch:
+Ensure you have Docker and Terraform installed
+
+Docker: https://docs.docker.com/engine/install/
+Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli 
+
 Please contact an admin at: guavacat23@gmail.com
 
 # Entity-Relationship Diagram (ERD):
