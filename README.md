@@ -26,8 +26,8 @@ You can visit the dashboard at: http://35.179.161.165:8501/
 ### To built from scratch:
 Ensure you have Docker and Terraform installed
 
-Docker: https://docs.docker.com/engine/install/
-Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli 
+- Docker: https://docs.docker.com/engine/install/
+- Terraform: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli 
 
 Please contact an admin at: guavacat23@gmail.com
 
