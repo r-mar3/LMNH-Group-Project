@@ -2,7 +2,7 @@
 from unittest.mock import MagicMock
 import pytest
 import pandas as pd
-from load import upload_table_data_with_foreign_key, upload_table_data
+from pipeline.load import upload_table_data_with_foreign_key, upload_table_data
 
 
 @pytest.fixture
