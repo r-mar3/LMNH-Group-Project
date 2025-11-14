@@ -4,4 +4,3 @@ requests
 pytest
 pylint
 pandas
-boto3

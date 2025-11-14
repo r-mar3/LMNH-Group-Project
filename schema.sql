@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS license;
 DROP TABLE IF EXISTS botanist;
 
 CREATE TABLE license (
-    license_id INT UNIQUE,
+    license_id INT IDENTITY (1,1),
     license_number INT UNIQUE,
     license_name VARCHAR(255) UNIQUE,
     license_url VARCHAR(255) UNIQUE,
@@ -17,7 +17,7 @@ CREATE TABLE license (
 );
 
 CREATE TABLE image (
-    image_id INT UNIQUE,
+    image_id INT IDENTITY (1,1),
     image_original_url VARCHAR(255) UNIQUE,
     image_regular_url VARCHAR(255) UNIQUE,
     image_medium_url VARCHAR(255) UNIQUE,
@@ -29,13 +29,13 @@ CREATE TABLE image (
 );
 
 CREATE TABLE country (
-    country_id INT UNIQUE,
+    country_id INT IDENTITY (1,1),
     country_name VARCHAR(255) UNIQUE,
     PRIMARY KEY (country_id)
 );
 
 CREATE TABLE city (
-    city_id INT UNIQUE,
+    city_id INT IDENTITY (1,1),
     city_name VARCHAR(255), -- Not unique, cities can have the same name
     country_id INT,
     PRIMARY KEY (city_id),
@@ -43,7 +43,7 @@ CREATE TABLE city (
 );
 
 CREATE TABLE origin (
-    origin_id INT UNIQUE,
+    origin_id INT IDENTITY (1,1),
     origin_longitude FLOAT, -- left non-unique in case of rounding errors
     origin_latitude FLOAT, -- left non-unique in case of rounding errors
     city_id INT,
@@ -52,7 +52,7 @@ CREATE TABLE origin (
 );
 
 CREATE TABLE species (
-    species_id INT UNIQUE,
+    species_id INT IDENTITY (1,1),
     species_name VARCHAR(255) UNIQUE,
     species_scientific_name VARCHAR(255) UNIQUE,
     image_id INT,
@@ -70,7 +70,7 @@ CREATE TABLE plant (
 );
 
 CREATE TABLE botanist (
-    botanist_id INT UNIQUE,
+    botanist_id INT IDENTITY (1,1),
     botanist_name VARCHAR(255), -- left non-unique for John Smiths
     botanist_email VARCHAR(255) UNIQUE,
     botanist_phone VARCHAR(255) UNIQUE,
@@ -79,11 +79,12 @@ CREATE TABLE botanist (
 
 CREATE TABLE reading (
     reading_id INT IDENTITY(1, 1),
-    reading_last_watered DATETIME, -- plants can be watered at the same time
-    reading_time_taken DATETIME, -- plants can be read at the same time
+    reading_last_watered DATETIME2, -- plants can be watered at the same time
+    reading_time_taken DATETIME2, -- plants can be read at the same time
     reading_soil_moisture FLOAT, -- plants can be equally moist
     reading_temperature FLOAT, -- plants can be equally hot or cold
-    reading_error TEXT,
+    reading_error BIT,
+    reading_alert BIT,
     botanist_id INT,
     plant_id INT,
     PRIMARY KEY (reading_id),
