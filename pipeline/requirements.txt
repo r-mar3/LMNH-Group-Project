@@ -4,5 +4,3 @@ requests
 pytest
 pylint
 pandas
-boto3
-streamlit
