@@ -11,10 +11,10 @@
 > Instructions on how to run the code (include examples?)
 
 # ERD:
-![alt text](erd.png)
+![alt text](diagrams/erd.png)
 
 # Architecture Diagram:
-![alt text](architecture.png)
+![alt text](diagrams/architecture.png)
 
 # Dashboard Wireframe
 <img width="442" height="643" alt="plants_wireframe" src="https://github.com/user-attachments/assets/07b6560f-93eb-4112-8784-557616821ed9" />
