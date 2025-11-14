@@ -1,7 +1,7 @@
 """Tests extract script edge cases, ideal and unideal behaviour"""
 import json
 import pytest
-from extract import save_to_json, check_new_endpoints, extract_data, BASE_NUM_ENDPOINTS
+from pipeline.extract import save_to_json, check_new_endpoints, extract_data, BASE_NUM_ENDPOINTS
 
 
 def test_save_to_json_contents_correct(monkeypatch, tmp_path):
@@ -10,7 +10,7 @@ def test_save_to_json_contents_correct(monkeypatch, tmp_path):
                  {'plant_id': 56, 'name': 'Crabby Hedge'}]
     fake_output = tmp_path/'plant_data_raw_test.json'
 
-    monkeypatch.setattr('extract.OUTPUT_FILE', str(fake_output))
+    monkeypatch.setattr('pipeline.extract.OUTPUT_FILE', str(fake_output))
     save_to_json(fake_data)
 
     with open(fake_output, 'r', encoding='utf-8') as f:
@@ -26,7 +26,7 @@ def test_save_to_json_empty(monkeypatch, tmp_path):
     fake_data = []
     fake_output = tmp_path/'plant_data_raw_test.json'
 
-    monkeypatch.setattr('extract.OUTPUT_FILE', str(fake_output))
+    monkeypatch.setattr('pipeline.extract.OUTPUT_FILE', str(fake_output))
     save_to_json(fake_data)
 
     with open(fake_output, 'r', encoding='utf-8') as f:
@@ -47,7 +47,7 @@ def monkeypatch_fetch_data_by_id_1(id_num):
 def test_check_new_endpoints_new_found(monkeypatch):
     """Asserts that if a new endpoint is found, the current_max_endpoint goes up
     by 5 during the search"""
-    monkeypatch.setattr('extract.fetch_data_by_id',
+    monkeypatch.setattr('pipeline.extract.fetch_data_by_id',
                         monkeypatch_fetch_data_by_id_1)
     result = check_new_endpoints()
     assert result == BASE_NUM_ENDPOINTS + 5
@@ -62,7 +62,7 @@ def monkeypatch_fetch_data_by_id_2(id_num):
 def test_check_new_endpoints_no_new_found(monkeypatch):
     """Asserts that if no new endpoint is found, the endpoint is equal to the
     base_num_endpoints value"""
-    monkeypatch.setattr("extract.fetch_data_by_id",
+    monkeypatch.setattr("pipeline.extract.fetch_data_by_id",
                         monkeypatch_fetch_data_by_id_2)
     result = check_new_endpoints()
     assert result == BASE_NUM_ENDPOINTS
@@ -95,12 +95,12 @@ def test_extract_data(monkeypatch, tmp_path):
     is successfully fetched and saved to .json file, and asserts that everything
     is working as expected"""
     fake_output = tmp_path/'plant_data_raw_test.json'
-    monkeypatch.setattr('extract.OUTPUT_FILE', str(fake_output))
-    monkeypatch.setattr('extract.BASE_NUM_ENDPOINTS', 3)
-    monkeypatch.setattr('extract.multiprocessing.Pool',
+    monkeypatch.setattr('pipeline.extract.OUTPUT_FILE', str(fake_output))
+    monkeypatch.setattr('pipeline.extract.BASE_NUM_ENDPOINTS', 3)
+    monkeypatch.setattr('pipeline.extract.multiprocessing.Pool',
                         lambda *a, **k: FakePool())
-    monkeypatch.setattr('extract.check_new_endpoints', lambda: 3)
-    monkeypatch.setattr('extract.fetch_data_by_id',
+    monkeypatch.setattr('pipeline.extract.check_new_endpoints', lambda: 3)
+    monkeypatch.setattr('pipeline.extract.fetch_data_by_id',
                         monkeypatch_fetch_data_by_id_3)
 
     extract_data()
@@ -131,12 +131,12 @@ def test_extract_data_some_errors(monkeypatch, tmp_path):
     is successfully fetched and saved to .json file, and asserts that everything
     is working as expected albeit the mixed success at fetching data"""
     fake_output = tmp_path/'plant_data_raw_test.json'
-    monkeypatch.setattr('extract.OUTPUT_FILE', str(fake_output))
-    monkeypatch.setattr('extract.BASE_NUM_ENDPOINTS', 7)
-    monkeypatch.setattr('extract.multiprocessing.Pool',
+    monkeypatch.setattr('pipeline.extract.OUTPUT_FILE', str(fake_output))
+    monkeypatch.setattr('pipeline.extract.BASE_NUM_ENDPOINTS', 7)
+    monkeypatch.setattr('pipeline.extract.multiprocessing.Pool',
                         lambda *a, **k: FakePool())
-    monkeypatch.setattr('extract.check_new_endpoints', lambda: 7)
-    monkeypatch.setattr('extract.fetch_data_by_id',
+    monkeypatch.setattr('pipeline.extract.check_new_endpoints', lambda: 7)
+    monkeypatch.setattr('pipeline.extract.fetch_data_by_id',
                         monkeypatch_fetch_data_by_id_some_errors)
 
     extract_data()
