@@ -80,6 +80,7 @@ def get_db_connection() -> pyodbc.Connection:
 
 
 def upload_table_data_with_foreign_key(conn: pyodbc.Connection, table_dict: dict, df: pd.DataFrame) -> None:
+    """Uploads the data in the given dataframe to the matching table in the database"""
     # all column names
     columns = table_dict['columns']
     column_names = ', '.join(columns)
