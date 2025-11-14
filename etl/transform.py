@@ -67,6 +67,14 @@ def load_data() -> pd.DataFrame:
     return pd.DataFrame(flatten_data(raw_data))
 
 
+def load_data() -> pd.DataFrame:
+    """Returns a flatted (denormalised) dataframe of all data in the raw data csv"""
+    with open(INPUT_PATH, 'r', encoding='utf-8') as f:
+        raw_data = json.load(f)
+
+    return pd.DataFrame(flatten_data(raw_data))
+
+
 def clean_phone(df: pd.DataFrame) -> pd.DataFrame:
     """Converts all phone numbers to symbol-less format, keeping extension codes"""
     df['botanist_phone'] = df['botanist_phone'].str.replace(
@@ -130,13 +138,7 @@ def add_alerts(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def setup_output() -> None:
-    """Setup output folder for clean data"""
-    if not os.path.exists(OUTPUT_PATH):
-        os.makedirs(OUTPUT_PATH)
-
-
-def transform_data() -> None:
+def transform() -> None:
     """Execute all transform processes"""
     setup_output()
     df = load_data()
