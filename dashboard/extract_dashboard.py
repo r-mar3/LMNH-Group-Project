@@ -21,6 +21,7 @@ def get_db_connection() -> pyodbc.Connection:
 
 
 def get_all_data() -> pd.DataFrame:
+    """Returns a dataframe of all tables joined"""
     conn = get_db_connection()
     query = """
             SELECT *
