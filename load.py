@@ -141,10 +141,12 @@ def upload_table_data_with_foreign_key(conn: pyodbc.Connection, table_dict: dict
         df = df.fillna(np.nan).replace([np.nan], None)
 
         df['reading_last_watered'] = pd.to_datetime(
-            df['reading_last_watered'])
+            df['reading_last_watered'],
+            format="ISO8601", utc=True)
 
         df['reading_time_taken'] = pd.to_datetime(
-            df['reading_time_taken'])
+            df['reading_time_taken'],
+            format="ISO8601", utc=True)
 
     # params for executemany must be a tuple, and must include the
     # values we want to insert, and the unique value to check against
