@@ -21,7 +21,7 @@ Data visualisation is also included, with the Streamlit dashboard providing a cl
 # How to run the code:
 > Instructions on how to run the code (include examples?)
 
-# ERD:
+# Entity-Relationship Diagram (ERD):
 The diagram below shows our database design, including entity relationships between each table in our database, normalised to 3NF.
 
 ![alt text](image-1.png)
