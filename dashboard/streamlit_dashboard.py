@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import altair as alt
+from extract_dashboard import get_all_data
 
 
 def dashboard_design(data: pd.DataFrame):
@@ -129,6 +130,6 @@ def most_alerted_botanist_chart(data: pd.DataFrame):
 
 
 if __name__ == '__main__':
-    input_data = pd.read_csv('./clean_data.csv')
+    input_data = get_all_data()
 
     dashboard_design(input_data)

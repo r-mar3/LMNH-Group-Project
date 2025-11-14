@@ -1,0 +1,8 @@
+pyodbc
+dotenv
+requests
+pytest
+pylint
+streamlit
+pandas
+altair

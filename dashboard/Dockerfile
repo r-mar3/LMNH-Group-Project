@@ -14,8 +14,11 @@ RUN apt-get update && \
     apt-get clean
 
 COPY streamlit_dashboard.py .
+COPY extract_dashboard.py .
 
 # Streamlit port
 EXPOSE 8501
 
-CMD streamlit run streamlit_dashboard.py
+# HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+ENV STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
+ENTRYPOINT ["streamlit", "run", "streamlit_dashboard.py", "--server.port=8501", "--server.address=0.0.0.0"]
