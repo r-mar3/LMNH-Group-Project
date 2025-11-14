@@ -42,7 +42,7 @@ In order to combat the challenges they are facing, we have built an automated pi
 - I also want a visual of the errors that the raspberry pi transmits using a live graph showing errors over time
 - Why? Because I want my efforts building this API and sensor connection to not be in vain.
 
-- I want to know if a sensor is runnning into continous errors with a single alert me based on repeated True values in a time constraint in the error column.
+- I want to know if a sensor is running into continous errors with a single alert me based on repeated True values in a time constraint in the error column.
 - Why? Because I want my efforts building this API and sensor connection to not be in vain.
 
 ## Hi, I'm Financially invested in the museum.
