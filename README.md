@@ -16,7 +16,7 @@ This project involved the creation of an automated ETL data pipeline which extra
 
 Both short-term storage (including plant health data for the past 24 hours) and long-term storage (including historical daily summary data) is offered. 
 
-Data visualisation is also included, with the Streamlit dashboard providing a clear and easily disgestable way to visualise real-time plant health data on latest temperature and moisture readings for each plant, as well as the ption to view historical plant health data.
+Data visualisation is also included, with the Streamlit dashboard providing a clear and easily disgestable way to visualise real-time plant health data on latest temperature and moisture readings for each plant, as well as the option to view historical plant health data.
 
 ## How to run the code:
 
