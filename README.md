@@ -5,11 +5,13 @@ This project was built for the Liverpool Natural History Museum (LMNH) to aid th
 
 They are currently able to monitor live plant health on various environmental factors, such as soil moisture and temperature, via sensors that are connected to Raspberry PI (using digital input or analog input port), which is then further connected to the museum network. Raspberry PI analyses and processes all incoming data using custom built software on the PI, before reporting the data live via an API endpoint.
 
-There are multiple issues that they are facing with their current set up which this project aims to help solve:
+There are multiple issues that they are facing with their current set up, which this project aims to help solve:
 
-1. The gardeners are only able to see the current health of the plant, meaning they cannot track plant health over time
-2. There is currently no system set up that alerts gardeners when there is a problem in plant health
-3. The plant sensor hardware is not very resilient and can often give faulty data
+1. The gardeners do not have a short-term storage solution for plant health data readings for each minute of 24 hours
+2. The gardeners also do not have a long-term storage solution for historical plant health summary readings
+3. The gardeners do not have a method to be able to visualise the data on plant health
+4. There is currently no system set up that alerts gardeners when there is a problem in plant health
+5. The plant sensor hardware is not very resilient and can often give faulty data
 
 ## How the project works:
 This project involved the creation of an automated ETL data pipeline which extracts plant health data from the pre-existing API every minute, transforms it so that the database is normalised and the data is cleaned and verified, before this data is then loaded into a database. An alerts system is now also supported, and error readings are labelled as errors.
