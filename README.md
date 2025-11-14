@@ -23,7 +23,7 @@ Data visualisation is also included, with the Streamlit dashboard providing a cl
 ## How to run the code:
 
 ### For general use:
-You can visit the dashboard at: http://35.179.161.165:8501/
+You can visit the dashboard at: http://35.179.96.82:8501
 
 ### To built from scratch:
 Ensure you have Docker and Terraform installed
