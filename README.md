@@ -1,4 +1,4 @@
-# LMNH-Group-Project 
+# LMNH Plant Health Monitoring Data Pipeline
 
 # Project Description:
 This project was built for the Liverpool Natural History Museum (LMNH) to aid them in monitoring the health of the plants found in their botanical wing. The LMNH has gardeners who are responsible for monitoring the plant health, but due to the number of plants with varying condition needs, monitoring can be very challenging.  
@@ -26,13 +26,17 @@ There are multiple issues that they are facing with their current set up which t
 
 # ERD:
 The diagram below shows our database design, including entity relationships between each table in our database, normalised to 3NF.
+
 ![alt text](image-1.png)
 
 # Architecture Diagram:
 The diagram below provides a visual representation of the AWS cloud system where our full data pipeline is being hosted, including how different services are connected to one another to help illustrate the data flow.
+
 ![alt text](image.png)
 
-# Dashboard Wireframe
+# Dashboard Wireframe:
+[CAPTION]
+
 <img width="442" height="643" alt="plants_wireframe" src="https://github.com/user-attachments/assets/07b6560f-93eb-4112-8784-557616821ed9" />
 
 
