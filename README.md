@@ -7,9 +7,11 @@ They are currently able to monitor live plant health on various environmental fa
 
 There are multiple issues that they are facing with their current set up which this project aims to help solve:
 
-1. The gardeners are only able to see the current health of the plant, meaning they cannot track plant health over time
-2. There is currently no system set up that alerts gardeners when there is a problem in plant health
-3. The plant sensor hardware is not very resilient and can often give faulty data
+1. The gardeners do not have a short term storage solution for plant health readings for every minute over 24 hours
+2. The gardeners also do not have a long term storage solution for plant health summary readings collected every day
+3. The gardeners do not currently have a method to visualise their recorded plant health data
+4. There is currently no system set up that alerts gardeners when there is a problem in plant health
+5. The plant sensor hardware is not very resilient and can often give faulty data
 
 ## How the project works:
 This project involved the creation of an automated ETL data pipeline which extracts plant health data from the pre-existing API every minute, transforms it so that the database is normalised and the data is cleaned and verified, before this data is then loaded into a database. An alerts system is now also supported, and error readings are labelled as errors.
