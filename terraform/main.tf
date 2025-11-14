@@ -258,6 +258,7 @@ resource "aws_lambda_function" "radas-lambda-etl-pipeline" {
   image_uri = "129033205317.dkr.ecr.eu-west-2.amazonaws.com/radas-plants-etl-ecr:latest"
 
   architectures = ["x86_64"]
+  
 
 }
 
