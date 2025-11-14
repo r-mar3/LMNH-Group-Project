@@ -28,10 +28,7 @@ In order to combat the challenges they are facing, we have built an automated pi
 
 ## Hi, I'm a Gardener.
 
-- I want to be alerted if the soil moisture is a concerning value (far outside average for a specific plant).
-- Why? Because I don't want my plants to die.
-
-- I want to be alerted if the temperature of a plant is a concerning value (far outside average for a specific plant).
+- I want to be alerted if the temperature or soil moisture is a concerning value (far outside average for a specific plant).
 - Why? Because I don't want my plants to die.
 
 ## Hi, I'm a Technician who helped setup the raspberry pi sensors.
