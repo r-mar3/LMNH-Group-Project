@@ -64,7 +64,7 @@ def alerts_over_time_chart(data: pd.DataFrame) -> alt.Chart:
 
 
 def count_of_alerts(data: pd.DataFrame, plants_filter: list) -> alt.Chart:
-
+    """Creates a chart showing count of alerts"""
     data = data[data['species_name'].isin(plants_filter)]
 
     data['reading_alert'] = data['reading_alert'].astype(int)
@@ -83,7 +83,7 @@ def count_of_alerts(data: pd.DataFrame, plants_filter: list) -> alt.Chart:
 
 
 def temperature_over_time_data(data: pd.DataFrame) -> pd.DataFrame:
-
+    """Creates a dataframe for temperature over time"""
     temperature_data = data[['reading_temperature',
                              'reading_time_taken', 'species_name']]
     # temperature_data = temperature_data[temperature_data['reading_temperature']]
@@ -96,7 +96,7 @@ def temperature_over_time_data(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def temperature_over_time_chart(data: pd.DataFrame, plants_filter: list) -> alt.Chart:
-
+    """Creates a chart for temperature data"""
     data = data[data['species_name'].isin(plants_filter)]
 
     chart = alt.Chart(data).mark_line().encode(
@@ -111,7 +111,7 @@ def temperature_over_time_chart(data: pd.DataFrame, plants_filter: list) -> alt.
 
 
 def moisture_over_time_data(data: pd.DataFrame) -> pd.DataFrame:
-
+    """Creates a dataframe for moisture over time"""
     moisture_data = data[['reading_soil_moisture',
                           'reading_time_taken', 'species_name']]
     moisture_data['reading_time_taken'] = pd.to_datetime(
@@ -126,7 +126,7 @@ def moisture_over_time_data(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def moisture_over_time_chart(data: pd.DataFrame, plants_filter: list) -> alt.Chart:
-
+    """Creates a chart for the moisture data"""
     data = data[data['species_name'].isin(plants_filter)]
 
     chart = alt.Chart(data).mark_line().encode(
@@ -141,7 +141,7 @@ def moisture_over_time_chart(data: pd.DataFrame, plants_filter: list) -> alt.Cha
 
 
 def most_alerted_botanist_data(data: pd.DataFrame) -> pd.DataFrame:
-
+    """Creates a dataframe for alerts by botanist"""
     botanist_data = data[['botanist_name', 'reading_alert']]
     botanist_data['reading_alert'] = botanist_data['reading_alert'].astype(int)
 
@@ -152,7 +152,7 @@ def most_alerted_botanist_data(data: pd.DataFrame) -> pd.DataFrame:
 
 
 def most_alerted_botanist_chart(data: pd.DataFrame, botanists_filter: list) -> alt.Chart:
-
+    """Creates a chart for botanist alert data"""
     data = data[data['botanist_name'].isin(botanists_filter)]
 
     chart = alt.Chart(data).mark_bar().encode(
