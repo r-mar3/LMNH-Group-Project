@@ -1,8 +1,12 @@
 # LMNH-Group-Project 
-> TO BE COMPLETED
 
 # Project Description:
-> What is this project for? What is the purpose here?
+This project was built for the Liverpool Natural History Museum (LMNH) to aid them in monitoring the health of the plants
+found in their botanical wing. The LMNH has gardeners who are responsible for monitoring the plant health, but due to the number of plants with varying
+condition needs, monitoring can be very challenging. 
+
+In order to combat the challenges they are facing, we have built an automated pipeline which extracts data on various environmental factors about each plant, such as soil moisture from each plant via their pre-existing API.
+
 
 # How the project works:
 > How does this project work? What does the code DO?
@@ -11,10 +15,10 @@
 > Instructions on how to run the code (include examples?)
 
 # ERD:
-![alt text](diagrams/erd.png)
+![alt text](image-1.png)
 
 # Architecture Diagram:
-![alt text](diagrams/architecture.png)
+![alt text](image.png)
 
 # Dashboard Wireframe
 <img width="442" height="643" alt="plants_wireframe" src="https://github.com/user-attachments/assets/07b6560f-93eb-4112-8784-557616821ed9" />
